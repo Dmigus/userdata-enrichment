@@ -1,14 +1,14 @@
 package usecases
 
-type Age int
-type Sex string
-type Nationality string
+type AgeType int
+type SexType string
+type NationalityType string
 
 type Record struct {
-	k           Key
-	age         Age
-	sex         Sex
-	nationality Nationality
+	Key         Key
+	Age         AgeType
+	Sex         SexType
+	Nationality NationalityType
 }
 
 type Key struct {
