@@ -8,6 +8,10 @@ import (
 	"userdata_enrichment/internal/usecases"
 )
 
+type Enricher interface {
+	Enrich(ctx context.Context, k usecases.Key) (usecases.Record, error)
+}
+
 type PullQueue interface {
 	Pull(ctx context.Context) (usecases.Key, error)
 }
@@ -28,14 +32,14 @@ type TransactionalStorage interface {
 	BeginTx(ctx context.Context) (Transaction, error)
 }
 
-type EnrichService struct {
+type Service struct {
 	started atomic.Bool
 	cf      context.CancelFunc
 	enr     Enricher
 	db      TransactionalStorage
 }
 
-func (es *EnrichService) Run() {
+func (es *Service) Run() {
 	if !es.started.CompareAndSwap(false, true) {
 		return
 	}
@@ -44,16 +48,14 @@ func (es *EnrichService) Run() {
 	go func() {
 		for {
 			err := es.oneCycle(ctx)
-			if err != nil {
-				if !errors.Is(err, context.Canceled) {
-					log.Println(err)
-				}
+			if err != nil && !errors.Is(err, context.Canceled) {
+				log.Println(err)
 			}
 		}
 	}()
 }
 
-func (es *EnrichService) oneCycle(ctx context.Context) error {
+func (es *Service) oneCycle(ctx context.Context) error {
 	tr, err := es.db.BeginTx(ctx)
 	if err != nil {
 		return err
@@ -76,7 +78,7 @@ func (es *EnrichService) oneCycle(ctx context.Context) error {
 	return tr.Commit(ctx)
 }
 
-func (es *EnrichService) Stop() {
+func (es *Service) Stop() {
 	es.cf()
 	es.started.Store(false)
 }

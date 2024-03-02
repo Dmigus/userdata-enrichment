@@ -1,4 +1,4 @@
-package enrich
+package usecases
 
 import (
 	"context"
@@ -62,8 +62,10 @@ func (en *Enricher) Enrich(ctx context.Context, k usecases.Key) (usecases.Record
 	if allErrs != nil {
 		return usecases.Record{}, allErrs
 	}
-	return usecases.Record{Key: k,
+	return usecases.Record{
+		Key:         k,
 		Age:         age,
 		Sex:         sex,
-		Nationality: nat}, nil
+		Nationality: nat,
+	}, nil
 }
