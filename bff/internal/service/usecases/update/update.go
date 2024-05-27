@@ -1,17 +1,17 @@
 package update
 
 import (
-	"bff/internal/service"
+	"bff/pkg/types"
 	"context"
 )
 
 type (
 	Request struct {
-		fio           service.FIO
+		fio           types.FIO
 		age, sex, nat bool
-		newAge        service.Age
-		newSex        service.Sex
-		newNat        service.Nationality
+		newAge        types.Age
+		newSex        types.Sex
+		newNat        types.Nationality
 	}
 	repo interface {
 		Update(ctx context.Context, req Request) error

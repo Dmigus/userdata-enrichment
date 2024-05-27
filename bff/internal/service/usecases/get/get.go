@@ -1,7 +1,7 @@
 package get
 
 import (
-	"bff/internal/service"
+	"bff/pkg/types"
 	"context"
 )
 
@@ -9,10 +9,10 @@ type (
 	Request struct {
 	}
 	Result struct {
-		Key         service.FIO
-		Age         service.Age
-		Sex         service.Sex
-		Nationality service.Nationality
+		Key         types.FIO
+		Age         types.Age
+		Sex         types.Sex
+		Nationality types.Nationality
 	}
 	repo interface {
 		Get(ctx context.Context, req Request) ([]Result, error)
