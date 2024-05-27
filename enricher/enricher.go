@@ -4,19 +4,18 @@ import (
 	"context"
 	"errors"
 	"sync"
-	"userdata_enrichment/internal/usecases"
 )
 
 type AgeComputer interface {
-	Get(context.Context, usecases.Key) (usecases.AgeType, error)
+	Get(context.Context, service.Key) (service.AgeType, error)
 }
 
 type SexComputer interface {
-	Get(context.Context, usecases.Key) (usecases.SexType, error)
+	Get(context.Context, service.Key) (service.SexType, error)
 }
 
 type NationalityComputer interface {
-	Get(context.Context, usecases.Key) (usecases.NationalityType, error)
+	Get(context.Context, service.Key) (service.NationalityType, error)
 }
 
 type Enricher struct {
@@ -33,24 +32,24 @@ func New(ageComp AgeComputer, sexComp SexComputer, natComp NationalityComputer) 
 	}
 }
 
-func (en *Enricher) Enrich(ctx context.Context, k usecases.Key) (usecases.Record, error) {
+func (en *Enricher) Enrich(ctx context.Context, k service.Key) (service.Record, error) {
 	wg := sync.WaitGroup{}
 	wg.Add(3)
-	var age usecases.AgeType
+	var age service.AgeType
 	var ageErr error
 	go func() {
 		defer wg.Done()
 		age, ageErr = en.ageComp.Get(ctx, k)
 	}()
 
-	var sex usecases.SexType
+	var sex service.SexType
 	var sexErr error
 	go func() {
 		defer wg.Done()
 		sex, sexErr = en.sexComp.Get(ctx, k)
 	}()
 
-	var nat usecases.NationalityType
+	var nat service.NationalityType
 	var natErr error
 	go func() {
 		defer wg.Done()
@@ -60,9 +59,9 @@ func (en *Enricher) Enrich(ctx context.Context, k usecases.Key) (usecases.Record
 	wg.Wait()
 	allErrs := errors.Join(ageErr, sexErr, natErr)
 	if allErrs != nil {
-		return usecases.Record{}, allErrs
+		return service.Record{}, allErrs
 	}
-	return usecases.Record{
+	return service.Record{
 		Key:         k,
 		Age:         age,
 		Sex:         sex,
