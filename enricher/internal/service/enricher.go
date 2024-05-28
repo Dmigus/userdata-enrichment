@@ -16,6 +16,7 @@ type (
 		Run(context.Context, Handler) error
 	}
 	repository interface {
+		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
 		Store(ctx context.Context, rec types.EnrichedRecord) error
 	}
 	EnrichService struct {
@@ -32,6 +33,15 @@ func NewEnrichService(runner fioHandlingRunner, enricher messagehandler.Enricher
 
 func (en *EnrichService) Run(ctx context.Context) error {
 	var handleFIOScenario funcHandler = func(ctx context.Context, fio types.FIO) {
+		present, err := en.repo.IsFIOPresents(ctx, fio)
+		if err != nil {
+			en.handleErr(ctx, fio, "err checking fio presence", err)
+			return
+		}
+		if !present {
+			en.logger.Info("fio is not present in repository", types.FioToZaFields(fio)...)
+			return
+		}
 		enriched, err := en.enricher.Enrich(ctx, fio)
 		if err != nil {
 			en.handleErr(ctx, fio, "err enriching fio", err)
