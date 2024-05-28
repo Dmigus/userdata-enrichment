@@ -3,7 +3,6 @@ package service
 import (
 	"bff/pkg/types"
 	"context"
-	"enricher/internal/providers/messagehandler"
 	"go.uber.org/zap"
 )
 
@@ -12,22 +11,25 @@ type (
 	Handler     interface {
 		Handle(ctx context.Context, fio types.FIO)
 	}
-	fioHandlingRunner interface {
+	FioHandlingRunner interface {
 		Run(context.Context, Handler) error
 	}
-	repository interface {
+	Repository interface {
 		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
 		Store(ctx context.Context, rec types.EnrichedRecord) error
 	}
+	Enricher interface {
+		Enrich(context.Context, types.FIO) (types.EnrichedRecord, error)
+	}
 	EnrichService struct {
-		enricher messagehandler.Enricher
-		runner   fioHandlingRunner
+		enricher Enricher
+		runner   FioHandlingRunner
 		logger   *zap.Logger
-		repo     repository
+		repo     Repository
 	}
 )
 
-func NewEnrichService(runner fioHandlingRunner, enricher messagehandler.Enricher, logger *zap.Logger, repo repository) *EnrichService {
+func NewEnrichService(runner FioHandlingRunner, enricher Enricher, logger *zap.Logger, repo Repository) *EnrichService {
 	return &EnrichService{runner: runner, enricher: enricher, logger: logger, repo: repo}
 }
 

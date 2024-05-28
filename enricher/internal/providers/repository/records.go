@@ -18,9 +18,13 @@ type (
 		UpdatedAt   time.Time
 	}
 	Repository struct {
-		db gorm.DB
+		db *gorm.DB
 	}
 )
+
+func New(db *gorm.DB) *Repository {
+	return &Repository{db: db}
+}
 
 func (Record) TableName() string {
 	return "Record"
