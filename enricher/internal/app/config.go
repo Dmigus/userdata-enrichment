@@ -11,7 +11,10 @@ type Config struct {
 		Brokers []string `json:"Brokers"`
 		Topic   string   `json:"Topic"`
 	} `json:"DataBus"`
-	Repository PostgresConnectConfig `json:"Repository"`
+	Repository         PostgresConnectConfig `json:"Repository"`
+	AgifyAddress       string                `json:"AgifyAddress"`
+	GenderizeAddress   string                `json:"GenderizeAddress"`
+	NationalityAddress string                `json:"NationalityAddress"`
 }
 
 // PostgresConnectConfig это конфиг для подключения к PostgreSQL
