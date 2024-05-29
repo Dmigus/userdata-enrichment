@@ -17,7 +17,7 @@ func initGlobalModule(lc fx.Lifecycle) (globResult, error) {
 	if err := initViper(); err != nil {
 		return globResult{}, err
 	}
-	config, err := readConfig()
+	config, err := parseConfig()
 	if err != nil {
 		return globResult{}, err
 	}

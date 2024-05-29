@@ -1,0 +1,16 @@
+{
+  "DataBus" : {
+    "Brokers": [""],
+    "Topic": "requests"
+  },
+  "Repository": {
+        "Host": "127.0.0.1",
+        "Port": 5432,
+        "Database": "postgres",
+        "User": "postgres"
+      },
+  "AgifyAddress": "https://api.agify.io/",
+  "GenderizeAddress": "https://api.genderize.io/",
+  "NationalityAddress": "https://api.nationalize.io/"
+
+}
