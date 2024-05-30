@@ -23,10 +23,9 @@ var Module = fx.Module("app",
 		messagehandler.New,
 
 		fx.Annotate(
-			handlingrunner.NewKafkaConsumerGroupRunner,
+			setupRunner,
 			fx.As(new(service.FioHandlingRunner)),
 		),
-		newConsumerGroupRunnerConfig,
 		repoConnection,
 		fx.Annotate(
 			computers.NewHttpQueryPerformer,
@@ -76,6 +75,15 @@ type serviceParams struct {
 	Repo     service.Repository
 }
 
+func setupRunner(lc fx.Lifecycle, config *Config, logger *zap.Logger) (*handlingrunner.KafkaConsumerGroupRunner, error) {
+	runner, err := handlingrunner.NewKafkaConsumerGroupRunner(config.DataBus.Brokers, config.DataBus.Topic, logger)
+	if err != nil {
+		return nil, err
+	}
+	lc.Append(fx.StopHook(runner.Close))
+	return runner, nil
+}
+
 func setupServiceLifecycle(lc fx.Lifecycle, params serviceParams) *service.EnrichService {
 	s := service.NewEnrichService(params.Runner, params.Enricher, params.Logger, params.Repo)
 	var cancelCtxFn context.CancelFunc
@@ -113,13 +121,6 @@ func repoConnection(lc fx.Lifecycle, config *Config) (*gorm.DB, error) {
 		return sqldb.Close()
 	}))
 	return db, nil
-}
-
-func newConsumerGroupRunnerConfig(config *Config, logger *zap.Logger) handlingrunner.ConsumerGroupRunnerConfig {
-	return handlingrunner.ConsumerGroupRunnerConfig{Brokers: config.DataBus.Brokers,
-		Topic:  config.DataBus.Topic,
-		Logger: logger,
-	}
 }
 
 func agifyAddress(config *Config) string {
