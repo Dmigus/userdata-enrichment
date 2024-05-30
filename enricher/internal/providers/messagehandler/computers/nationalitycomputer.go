@@ -12,7 +12,7 @@ import (
 type (
 	NationalityComputer struct {
 		urlTemplate   *url.URL
-		callPerformer callPerformer
+		callPerformer CallPerformer
 	}
 	nationalizeResult struct {
 		CountryField []struct {
@@ -21,7 +21,7 @@ type (
 	}
 )
 
-func NewNationalityComputer(hostname string, callPerformer callPerformer) (*NationalityComputer, error) {
+func NewNationalityComputer(hostname string, callPerformer CallPerformer) (*NationalityComputer, error) {
 	urlTemplate, err := url.Parse(hostname)
 	if err != nil {
 		return nil, err

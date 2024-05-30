@@ -20,6 +20,10 @@ type KafkaConsumerGroupRunner struct {
 
 // NewKafkaConsumerGroupRunner возращает новый KafkaConsumerGroupRunner, сконфигурированный на брокеры brokers и топик topic
 func NewKafkaConsumerGroupRunner(config ConsumerGroupRunnerConfig) (*KafkaConsumerGroupRunner, error) {
+	kgr := &KafkaConsumerGroupRunner{config: config}
+	if err := kgr.init(); err != nil {
+		return nil, err
+	}
 	return &KafkaConsumerGroupRunner{config: config}, nil
 }
 
@@ -48,16 +52,12 @@ func (k *KafkaConsumerGroupRunner) UpdateConfig(config ConsumerGroupRunnerConfig
 }
 
 // Run обрабатывает поступающие сообщения переданным хандлером в рамках группы. Блокирующий.
-func (k *KafkaConsumerGroupRunner) Run(ctx context.Context, handler service.Handler) (err error) {
-	err = k.init()
-	if err != nil {
-		return err
-	}
+func (k *KafkaConsumerGroupRunner) Run(ctx context.Context, handler service.Handler) {
 	defer k.cg.CloseWhenIsNotUsed()
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return
 		default:
 			k.consumeCycle(ctx, handler)
 		}

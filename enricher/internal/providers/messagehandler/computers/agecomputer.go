@@ -12,16 +12,16 @@ import (
 const nameKey = "name"
 
 type (
-	callPerformer interface {
+	CallPerformer interface {
 		PerformGetReq(ctx context.Context, url string) ([]byte, error)
 	}
 	AgifyComputer struct {
 		urlTemplate   *url.URL
-		callPerformer callPerformer
+		callPerformer CallPerformer
 	}
 )
 
-func NewAgifyComputer(hostname string, callPerformer callPerformer) (*AgifyComputer, error) {
+func NewAgifyComputer(hostname string, callPerformer CallPerformer) (*AgifyComputer, error) {
 	urlTemplate, err := url.Parse(hostname)
 	if err != nil {
 		return nil, err

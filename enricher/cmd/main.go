@@ -4,13 +4,14 @@ package main
 import (
 	"enricher/internal/app"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
 )
 
 type globResult struct {
 	fx.Out
-	config *app.Config
-	logger *zap.Logger
+	Config *app.Config
+	Logger *zap.Logger
 }
 
 func initGlobalModule(lc fx.Lifecycle) (globResult, error) {
@@ -26,12 +27,14 @@ func initGlobalModule(lc fx.Lifecycle) (globResult, error) {
 		return globResult{}, err
 	}
 	lc.Append(fx.StopHook(logger.Sync))
-	return globResult{logger: logger, config: config}, nil
+	return globResult{Logger: logger, Config: config}, nil
 }
 
 func main() {
-
 	fx.New(fx.Provide(initGlobalModule),
+		fx.WithLogger(func(log *zap.Logger) fxevent.Logger {
+			return &fxevent.ZapLogger{Logger: log}
+		}),
 		app.Module,
 	).Run()
 }

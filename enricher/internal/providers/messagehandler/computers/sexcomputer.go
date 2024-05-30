@@ -12,11 +12,11 @@ import (
 type (
 	SexComputer struct {
 		urlTemplate   *url.URL
-		callPerformer callPerformer
+		callPerformer CallPerformer
 	}
 )
 
-func NewSexComputer(hostname string, callPerformer callPerformer) (*SexComputer, error) {
+func NewSexComputer(hostname string, callPerformer CallPerformer) (*SexComputer, error) {
 	urlTemplate, err := url.Parse(hostname)
 	if err != nil {
 		return nil, err

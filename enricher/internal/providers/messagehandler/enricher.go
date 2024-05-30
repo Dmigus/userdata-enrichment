@@ -6,26 +6,26 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type ageComputer interface {
+type AgeComputer interface {
 	Get(context.Context, types.FIO) (types.Age, error)
 }
 
-type sexComputer interface {
+type SexComputer interface {
 	Get(context.Context, types.FIO) (types.Sex, error)
 }
 
-type nationalityComputer interface {
+type NationalityComputer interface {
 	Get(context.Context, types.FIO) (types.Nationality, error)
 }
 
 // Enricher обогащает информацией по ФИО
 type Enricher struct {
-	ageComp ageComputer
-	sexComp sexComputer
-	natComp nationalityComputer
+	ageComp AgeComputer
+	sexComp SexComputer
+	natComp NationalityComputer
 }
 
-func New(ageComp ageComputer, sexComp sexComputer, natComp nationalityComputer) *Enricher {
+func New(ageComp AgeComputer, sexComp SexComputer, natComp NationalityComputer) *Enricher {
 	return &Enricher{
 		ageComp,
 		sexComp,

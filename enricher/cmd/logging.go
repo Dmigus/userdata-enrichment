@@ -17,6 +17,8 @@ func getLogger() (*zap.Logger, error) {
 	cfg.Level = level
 	cfg.OutputPaths = []string{"stdout"}
 	cfg.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
-	logger, err := cfg.Build(zap.WithCaller(false))
+	cfg.DisableStacktrace = true
+	cfg.DisableCaller = true
+	logger, err := cfg.Build()
 	return logger, err
 }

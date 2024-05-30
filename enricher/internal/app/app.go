@@ -16,68 +16,81 @@ import (
 
 var Module = fx.Module("app",
 	fx.Provide(
-		repository.New,
+		fx.Annotate(
+			repository.New,
+			fx.As(new(service.Repository))),
 		setupServiceLifecycle,
 		messagehandler.New,
-		handlingrunner.NewKafkaConsumerGroupRunner,
+
+		fx.Annotate(
+			handlingrunner.NewKafkaConsumerGroupRunner,
+			fx.As(new(service.FioHandlingRunner)),
+		),
 		newConsumerGroupRunnerConfig,
 		repoConnection,
-		computers.NewHttpQueryPerformer,
+		fx.Annotate(
+			computers.NewHttpQueryPerformer,
+			fx.As(new(computers.CallPerformer)),
+		),
 
 		fx.Annotate(
 			agifyAddress,
-			fx.ResultTags(`name:"agifyAddress"'`),
+			fx.ResultTags(`name:"agifyAddress"`),
 		),
 		fx.Annotate(
 			computers.NewAgifyComputer,
-			fx.ParamTags(`name:"agifyAddress"'`, ``),
+			fx.ParamTags(`name:"agifyAddress"`, ``),
+			fx.As(new(messagehandler.AgeComputer)),
 		),
 
 		fx.Annotate(
 			genderizeAddress,
-			fx.ResultTags(`name:"genderizeAddress"'`),
+			fx.ResultTags(`name:"genderizeAddress"`),
 		),
 		fx.Annotate(
 			computers.NewSexComputer,
-			fx.ParamTags(`name:"sexAdgenderizeAddressdress"'`, ``),
+			fx.ParamTags(`name:"genderizeAddress"`, ``),
+			fx.As(new(messagehandler.SexComputer)),
 		),
 
 		fx.Annotate(
 			nationalityAddress,
-			fx.ResultTags(`name:"nationalityAddress"'`),
+			fx.ResultTags(`name:"nationalityAddress"`),
 		),
 		fx.Annotate(
 			computers.NewNationalityComputer,
-			fx.ParamTags(`name:"nationalityAddress"'`, ``),
+			fx.ParamTags(`name:"nationalityAddress"`, ``),
+			fx.As(new(messagehandler.NationalityComputer)),
 		),
 	),
 	fx.Supply(http.Client{}),
 	fx.Decorate(decorateLogger),
+	fx.Invoke(func(_ *service.EnrichService) {}),
 )
 
 type serviceParams struct {
 	fx.In
-	runner   service.FioHandlingRunner
-	enricher *messagehandler.Enricher
-	logger   *zap.Logger
-	repo     service.Repository
+	Runner   service.FioHandlingRunner
+	Enricher *messagehandler.Enricher
+	Logger   *zap.Logger
+	Repo     service.Repository
 }
 
 func setupServiceLifecycle(lc fx.Lifecycle, params serviceParams) *service.EnrichService {
-	s := service.NewEnrichService(params.runner, params.enricher, params.logger, params.repo)
+	s := service.NewEnrichService(params.Runner, params.Enricher, params.Logger, params.Repo)
 	var cancelCtxFn context.CancelFunc
-	sErr := make(chan error)
+	done := make(chan struct{})
 	lc.Append(fx.StartHook(func(ctx context.Context) {
 		var childCtx context.Context
 		childCtx, cancelCtxFn = context.WithCancel(ctx)
 		go func() {
-			defer close(sErr)
-			sErr <- s.Run(childCtx)
+			defer close(done)
+			s.Run(childCtx)
 		}()
 	}))
-	lc.Append(fx.StopHook(func() error {
+	lc.Append(fx.StopHook(func() {
 		cancelCtxFn()
-		return <-sErr
+		<-done
 	}))
 	return s
 }

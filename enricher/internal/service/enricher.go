@@ -12,7 +12,7 @@ type (
 		Handle(ctx context.Context, fio types.FIO)
 	}
 	FioHandlingRunner interface {
-		Run(context.Context, Handler) error
+		Run(context.Context, Handler)
 	}
 	Repository interface {
 		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
@@ -33,7 +33,7 @@ func NewEnrichService(runner FioHandlingRunner, enricher Enricher, logger *zap.L
 	return &EnrichService{runner: runner, enricher: enricher, logger: logger, repo: repo}
 }
 
-func (en *EnrichService) Run(ctx context.Context) error {
+func (en *EnrichService) Run(ctx context.Context) {
 	var handleFIOScenario funcHandler = func(ctx context.Context, fio types.FIO) {
 		present, err := en.repo.IsFIOPresents(ctx, fio)
 		if err != nil {
@@ -52,7 +52,7 @@ func (en *EnrichService) Run(ctx context.Context) error {
 		err = en.repo.Store(ctx, enriched)
 		en.handleErr(ctx, fio, "err storing to repository", err)
 	}
-	return en.runner.Run(ctx, handleFIOScenario)
+	en.runner.Run(ctx, handleFIOScenario)
 }
 
 func (en *EnrichService) handleErr(ctx context.Context, fio types.FIO, msg string, err error) {
