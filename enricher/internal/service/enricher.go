@@ -1,8 +1,8 @@
 package service
 
 import (
-	"bff/pkg/types"
 	"context"
+	"enrichstorage/pkg/types"
 	"go.uber.org/zap"
 )
 
@@ -14,9 +14,9 @@ type (
 	FioHandlingRunner interface {
 		Run(context.Context, Handler)
 	}
-	Repository interface {
+	Storage interface {
 		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
-		Store(ctx context.Context, rec types.EnrichedRecord) error
+		Update(ctx context.Context, rec types.EnrichedRecord) error
 	}
 	Enricher interface {
 		Enrich(context.Context, types.FIO) (types.EnrichedRecord, error)
@@ -25,11 +25,11 @@ type (
 		enricher Enricher
 		runner   FioHandlingRunner
 		logger   *zap.Logger
-		repo     Repository
+		repo     Storage
 	}
 )
 
-func NewEnrichService(runner FioHandlingRunner, enricher Enricher, logger *zap.Logger, repo Repository) *EnrichService {
+func NewEnrichService(runner FioHandlingRunner, enricher Enricher, logger *zap.Logger, repo Storage) *EnrichService {
 	return &EnrichService{runner: runner, enricher: enricher, logger: logger, repo: repo}
 }
 
@@ -49,7 +49,7 @@ func (en *EnrichService) Run(ctx context.Context) {
 			en.handleErr(ctx, fio, "err enriching fio", err)
 			return
 		}
-		err = en.repo.Store(ctx, enriched)
+		err = en.repo.Update(ctx, enriched)
 		en.handleErr(ctx, fio, "err storing to repository", err)
 	}
 	en.runner.Run(ctx, handleFIOScenario)

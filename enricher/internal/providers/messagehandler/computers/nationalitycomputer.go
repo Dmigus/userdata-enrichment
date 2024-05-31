@@ -2,9 +2,9 @@
 package computers
 
 import (
-	"bff/pkg/types"
 	"context"
 	"encoding/json"
+	"enrichstorage/pkg/types"
 	"fmt"
 	"net/url"
 )

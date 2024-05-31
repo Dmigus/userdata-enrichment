@@ -1,8 +1,8 @@
 package update
 
 import (
-	"bff/pkg/types"
 	"context"
+	"enrichstorage/pkg/types"
 )
 
 type (

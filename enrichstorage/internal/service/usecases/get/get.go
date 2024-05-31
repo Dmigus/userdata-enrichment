@@ -1,8 +1,8 @@
 package get
 
 import (
-	"bff/pkg/types"
 	"context"
+	"enrichstorage/pkg/types"
 )
 
 type (

@@ -1,8 +1,8 @@
 package messagehandler
 
 import (
-	"bff/pkg/types"
 	"context"
+	"enrichstorage/pkg/types"
 	"golang.org/x/sync/errgroup"
 )
 

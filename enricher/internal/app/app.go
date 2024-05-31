@@ -5,7 +5,6 @@ import (
 	"enricher/internal/providers/handlingrunner"
 	"enricher/internal/providers/messagehandler"
 	"enricher/internal/providers/messagehandler/computers"
-	"enricher/internal/providers/repository"
 	"enricher/internal/service"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -17,8 +16,8 @@ import (
 var Module = fx.Module("app",
 	fx.Provide(
 		fx.Annotate(
-			repository.New,
-			fx.As(new(service.Repository))),
+			storage.New,
+			fx.As(new(service.Storage))),
 		setupServiceLifecycle,
 		messagehandler.New,
 
@@ -72,7 +71,7 @@ type serviceParams struct {
 	Runner   service.FioHandlingRunner
 	Enricher *messagehandler.Enricher
 	Logger   *zap.Logger
-	Repo     service.Repository
+	Repo     service.Storage
 }
 
 func setupRunner(lc fx.Lifecycle, config *Config, logger *zap.Logger) (*handlingrunner.KafkaConsumerGroupRunner, error) {

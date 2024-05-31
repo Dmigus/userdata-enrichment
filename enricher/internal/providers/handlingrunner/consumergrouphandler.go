@@ -1,10 +1,10 @@
 package handlingrunner
 
 import (
-	"bff/pkg/types"
 	"context"
 	"encoding/json"
 	"enricher/internal/service"
+	"enrichstorage/pkg/types"
 
 	"github.com/IBM/sarama"
 	"github.com/dnwe/otelsarama"

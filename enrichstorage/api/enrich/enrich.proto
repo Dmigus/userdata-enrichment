@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "enrich/v1";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+
+service EnrichStorage {
+  rpc IsFIOPresents(FIO) returns (google.protobuf.BoolValue);
+  rpc Update(Enriched) returns (google.protobuf.Empty);
+}
+
+message FIO {
+  string surname = 1;
+  string name = 2;
+  string patronymic = 3;
+}
+
+message Enriched{
+  FIO fio = 1;
+  int32 age = 2;
+  string sex = 3;
+  string nationality = 4;
+}
