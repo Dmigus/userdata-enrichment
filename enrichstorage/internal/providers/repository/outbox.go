@@ -18,6 +18,10 @@ type (
 	}
 )
 
+func NewOutbox(db *gorm.DB) *Outbox {
+	return &Outbox{db: db}
+}
+
 func (o *Outbox) FIOComputeRequested(ctx context.Context, fio types.FIO) error {
 	rec := FioOutbox{Payload: fioToBytes(fio)}
 	result := o.db.WithContext(ctx).Select("payload").Create(&rec)
