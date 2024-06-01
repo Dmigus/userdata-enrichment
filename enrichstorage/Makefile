@@ -1,4 +1,10 @@
 
+.PHONY: migrate
+migrate:
+	@export POSTGRES_PASSWORD=$(shell cat ../deployments/db_password.txt) && \
+	sql-migrate up -config migrations/dbconfig.yml -env docker_env
+
+
 # Используем bin в текущей директории для установки плагинов protoc
 LOCAL_BIN:=$(CURDIR)/bin
 

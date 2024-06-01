@@ -27,7 +27,7 @@ func New(db *gorm.DB) *Repository {
 }
 
 func (Record) TableName() string {
-	return "Record"
+	return "record"
 }
 
 func (r *Repository) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error) {
