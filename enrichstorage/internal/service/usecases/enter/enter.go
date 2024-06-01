@@ -6,25 +6,44 @@ import (
 )
 
 type (
-	repo interface {
+	Records interface {
 		Create(ctx context.Context, key types.FIO) error
+	}
+	Outbox interface {
+		FIOComputeRequested(ctx context.Context, fio types.FIO) error
+	}
+	txManager interface {
+		WithinTransaction(context.Context, func(Records, Outbox) bool) error
 	}
 	handleQueue interface {
 		Push(ctx context.Context, key types.FIO) error
 	}
 	Enterer struct {
-		repo  repo
-		queue handleQueue
+		txManager txManager
 	}
 )
 
-func NewEnterer(repo repo, queue handleQueue) *Enterer {
-	return &Enterer{repo: repo, queue: queue}
+func NewEnterer(txManager txManager) *Enterer {
+	return &Enterer{txManager: txManager}
 }
 
 func (e *Enterer) Enter(ctx context.Context, fio types.FIO) error {
-	if err := e.queue.Push(ctx, fio); err != nil {
-		return err
+	var businessErr error
+	txErr := e.txManager.WithinTransaction(ctx, func(rec Records, out Outbox) bool {
+		err := rec.Create(ctx, fio)
+		if err != nil {
+			businessErr = err
+			return false
+		}
+		err = out.FIOComputeRequested(ctx, fio)
+		if err != nil {
+			businessErr = err
+			return false
+		}
+		return true
+	})
+	if businessErr != nil {
+		return businessErr
 	}
-	return e.repo.Create(ctx, fio)
+	return txErr
 }

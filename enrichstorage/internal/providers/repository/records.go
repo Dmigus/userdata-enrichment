@@ -17,20 +17,21 @@ type (
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
 	}
-	Repository struct {
+
+	Records struct {
 		db *gorm.DB
 	}
 )
 
-func New(db *gorm.DB) *Repository {
-	return &Repository{db: db}
+func New(db *gorm.DB) *Records {
+	return &Records{db: db}
 }
 
 func (Record) TableName() string {
 	return "record"
 }
 
-func (r *Repository) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error) {
+func (r *Records) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error) {
 	rec := Record{fio: fio}
 	result := r.db.WithContext(ctx).First(&rec)
 	if result.Error == nil {
@@ -42,7 +43,7 @@ func (r *Repository) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, er
 	return false, result.Error
 }
 
-func (r *Repository) Update(ctx context.Context, rec types.EnrichedRecord) error {
+func (r *Records) Update(ctx context.Context, rec types.EnrichedRecord) error {
 	dbRec := Record{fio: rec.Key, age: rec.Age, sex: rec.Sex, nationality: rec.Nationality}
 	result := r.db.WithContext(ctx).Save(&dbRec)
 	return result.Error
