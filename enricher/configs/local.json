@@ -3,14 +3,8 @@
     "Brokers": ["127.0.0.1:9092"],
     "Topic": "requests"
   },
-  "Repository": {
-        "Host": "127.0.0.1",
-        "Port": 5432,
-        "Database": "postgres",
-        "User": "postgres"
-      },
   "AgifyAddress": "https://api.agify.io/",
   "GenderizeAddress": "https://api.genderize.io/",
-  "NationalityAddress": "https://api.nationalize.io/"
-
+  "NationalityAddress": "https://api.nationalize.io/",
+  "EnrichStorageAddress": "127.0.0.1:50051"
 }

@@ -5,18 +5,23 @@ import (
 	"enricher/internal/providers/handlingrunner"
 	"enricher/internal/providers/messagehandler"
 	"enricher/internal/providers/messagehandler/computers"
+	"enricher/internal/providers/storage"
 	"enricher/internal/service"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"net/http"
 )
 
 var Module = fx.Module("app",
 	fx.Provide(
+
 		fx.Annotate(
-			storage.New,
+			enrichStorageAddress,
+			fx.ResultTags(`name:"enrichStorageAddress"`),
+		),
+		fx.Annotate(
+			storage.NewEnrichStorage,
+			fx.ParamTags(`name:"enrichStorageAddress"`),
 			fx.As(new(service.Storage))),
 		setupServiceLifecycle,
 		messagehandler.New,
@@ -25,7 +30,6 @@ var Module = fx.Module("app",
 			setupRunner,
 			fx.As(new(service.FioHandlingRunner)),
 		),
-		repoConnection,
 		fx.Annotate(
 			computers.NewHttpQueryPerformer,
 			fx.As(new(computers.CallPerformer)),
@@ -106,22 +110,6 @@ func decorateLogger(logger *zap.Logger) *zap.Logger {
 	return logger.Named("app")
 }
 
-func repoConnection(lc fx.Lifecycle, config *Config) (*gorm.DB, error) {
-	dsn := config.Repository.GetPostgresDSN()
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-	sqldb, err := db.DB()
-	if err != nil {
-		return nil, err
-	}
-	lc.Append(fx.StopHook(func() error {
-		return sqldb.Close()
-	}))
-	return db, nil
-}
-
 func agifyAddress(config *Config) string {
 	return config.AgifyAddress
 }
@@ -131,5 +119,9 @@ func genderizeAddress(config *Config) string {
 }
 
 func nationalityAddress(config *Config) string {
+	return config.NationalityAddress
+}
+
+func enrichStorageAddress(config *Config) string {
 	return config.NationalityAddress
 }
