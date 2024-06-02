@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"enrichstorage/internal/service/usecases/enter"
+	"enrichstorage/internal/service/usecases/create"
 	"errors"
 	"gorm.io/gorm"
 )
@@ -17,7 +17,7 @@ func NewTxManager(db *gorm.DB) *TxManager {
 	return &TxManager{db: db}
 }
 
-func (m *TxManager) WithinTransaction(ctx context.Context, scenario func(context.Context, enter.Records, enter.Outbox) bool) error {
+func (m *TxManager) WithinTransaction(ctx context.Context, scenario func(context.Context, create.Records, create.Outbox) bool) error {
 	err := m.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		ctx := tx.Statement.Context
 		records := NewRecords(tx)

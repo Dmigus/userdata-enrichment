@@ -30,14 +30,14 @@ bin/protoc-gen-go-grpc:
 
 .bin-deps: bin/protoc-gen-go bin/protoc-gen-go-grpc
 
-LOMS_PROTO_PATH := api/enrich
-OUT_DIR := internal/pkg/$(LOMS_PROTO_PATH)
+ENRICH_PROTO_PATH := api/enrich
+OUT_DIR := internal/controllers/grpc/protoc
 
 .PHONY: protoc-generate-service
 protoc-generate-service: .bin-deps .vendor-proto
 	mkdir -p $(OUT_DIR)
 	protoc \
-	-I $(LOMS_PROTO_PATH) \
+	-I $(ENRICH_PROTO_PATH) \
 	-I vendor-proto \
 	--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
 	--go_out=$(OUT_DIR) \
@@ -45,6 +45,6 @@ protoc-generate-service: .bin-deps .vendor-proto
 	--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 	--go-grpc_out=$(OUT_DIR)  \
 	--go-grpc_opt=paths=source_relative \
-	$(LOMS_PROTO_PATH)/*.proto
+	$(ENRICH_PROTO_PATH)/*.proto
 	go mod tidy
 

@@ -1,4 +1,4 @@
-package enter
+package create
 
 import (
 	"context"
@@ -15,19 +15,16 @@ type (
 	txManager interface {
 		WithinTransaction(context.Context, func(Records, Outbox) bool) error
 	}
-	handleQueue interface {
-		Push(ctx context.Context, key types.FIO) error
-	}
 	Enterer struct {
 		txManager txManager
 	}
 )
 
-func NewEnterer(txManager txManager) *Enterer {
+func NewCreator(txManager txManager) *Enterer {
 	return &Enterer{txManager: txManager}
 }
 
-func (e *Enterer) Enter(ctx context.Context, fio types.FIO) error {
+func (e *Enterer) Create(ctx context.Context, fio types.FIO) error {
 	var businessErr error
 	txErr := e.txManager.WithinTransaction(ctx, func(rec Records, out Outbox) bool {
 		err := rec.Create(ctx, fio)

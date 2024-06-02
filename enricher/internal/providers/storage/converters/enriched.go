@@ -6,7 +6,7 @@ import (
 )
 
 func EnrichedToDto(en types.EnrichedRecord) *v1.Enriched {
-	fioDTO := FioToDTO(en.Key)
+	fioDTO := FioToDTO(en.Fio)
 	return &v1.Enriched{
 		Fio:         fioDTO,
 		Age:         int32(en.Age),

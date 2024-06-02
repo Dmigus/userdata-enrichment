@@ -61,7 +61,7 @@ func (en *Enricher) Enrich(ctx context.Context, k types.FIO) (types.EnrichedReco
 	}
 
 	return types.EnrichedRecord{
-		Key:         k,
+		Fio:         k,
 		Age:         age,
 		Sex:         sex,
 		Nationality: nat,

@@ -11,7 +11,7 @@ import (
 
 type (
 	Record struct {
-		fio         types.FIO `gorm:"embedded;primaryKey;->;<-:false"`
+		fio         types.FIO `gorm:"embedded;primaryKey"`
 		age         types.Age
 		sex         types.Sex
 		nationality types.Nationality
@@ -45,7 +45,7 @@ func (r *Records) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error
 }
 
 func (r *Records) Update(ctx context.Context, rec types.EnrichedRecord) error {
-	dbRec := Record{fio: rec.Key, age: rec.Age, sex: rec.Sex, nationality: rec.Nationality}
+	dbRec := Record{fio: rec.Fio, age: rec.Age, sex: rec.Sex, nationality: rec.Nationality}
 	result := r.db.WithContext(ctx).Select("age", "sex", "nationality").Updates(&dbRec)
 	return result.Error
 }
@@ -53,5 +53,11 @@ func (r *Records) Update(ctx context.Context, rec types.EnrichedRecord) error {
 func (r *Records) Create(ctx context.Context, fio types.FIO) error {
 	dbRec := Record{fio: fio}
 	result := r.db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(&dbRec)
+	return result.Error
+}
+
+func (r *Records) Delete(ctx context.Context, fio types.FIO) error {
+	dbRec := Record{fio: fio}
+	result := r.db.WithContext(ctx).Delete(&dbRec)
 	return result.Error
 }

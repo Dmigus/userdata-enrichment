@@ -1,6 +1,9 @@
 package types
 
-import "go.uber.org/zap"
+import (
+	"fmt"
+	"go.uber.org/zap"
+)
 
 type Age = int
 type Sex = string
@@ -8,6 +11,13 @@ type Nationality = string
 
 type FIO struct {
 	name, surname, patronymic string
+}
+
+func NewFIO(name, surname, patronymic string) (FIO, error) {
+	if len(name) == 0 || len(surname) == 0 {
+		return FIO{}, fmt.Errorf("incorrect fio")
+	}
+	return FIO{name, surname, patronymic}, nil
 }
 
 func (fio FIO) hasPatronymic() bool {
@@ -37,7 +47,7 @@ func FioToZaFields(fio FIO) []zap.Field {
 }
 
 type EnrichedRecord struct {
-	Key         FIO
+	Fio         FIO
 	Age         Age
 	Sex         Sex
 	Nationality Nationality
