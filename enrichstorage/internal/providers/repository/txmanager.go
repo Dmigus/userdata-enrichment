@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"enrichstorage/internal/service/usecases/create"
+	"enrichstorage/internal/service/enrichstorage/create"
 	"errors"
 	"gorm.io/gorm"
 )

@@ -7,11 +7,11 @@ import (
 
 type (
 	Request struct {
-		fio           types.FIO
-		age, sex, nat bool
-		newAge        types.Age
-		newSex        types.Sex
-		newNat        types.Nationality
+		Fio                                           types.FIO
+		AgePresents, SexPresents, NationalityPresents bool
+		NewAge                                        types.Age
+		NewSex                                        types.Sex
+		NewNat                                        types.Nationality
 	}
 	repo interface {
 		Update(ctx context.Context, req Request) error
