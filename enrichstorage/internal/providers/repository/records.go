@@ -4,9 +4,10 @@ import (
 	"context"
 	"enrichstorage/pkg/types"
 	"errors"
+	"time"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"time"
 )
 
 type (

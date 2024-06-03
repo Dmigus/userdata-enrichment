@@ -3,10 +3,10 @@ package outboxsender
 
 import (
 	"context"
+	"enrichstorage/pkg/types"
 	"fmt"
 	"time"
 
-	"enrichstorage/pkg/types"
 	"go.uber.org/zap"
 )
 

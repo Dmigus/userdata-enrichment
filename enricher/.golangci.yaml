@@ -46,7 +46,6 @@ linters:
     - govet
     - ineffassign
     - megacheck
-    - revive
     - typecheck
     - unused
 

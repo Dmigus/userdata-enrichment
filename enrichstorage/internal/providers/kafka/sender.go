@@ -3,21 +3,22 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"enrichstorage/pkg/types"
+
 	"github.com/IBM/sarama"
 	"github.com/samber/lo"
 )
 
-type messagesSender interface {
-	SendMessages([]*sarama.ProducerMessage) error
-}
-
-// Sender это провайдер, который умеет отправлять сообщения в кафку
-type Sender struct {
-	topic    string
-	producer messagesSender
-}
+type (
+	messagesSender interface {
+		SendMessages([]*sarama.ProducerMessage) error
+	}
+	// Sender это провайдер, который умеет отправлять сообщения в кафку
+	Sender struct {
+		topic    string
+		producer messagesSender
+	}
+)
 
 // NewSender создайт новый Sender
 func NewSender(brokers []string, topic string) (*Sender, error) {
@@ -41,7 +42,7 @@ func (p *Sender) SendMessages(_ context.Context, fios []types.FIO) error {
 }
 
 func (p *Sender) modelMessageToSarama(fio types.FIO) *sarama.ProducerMessage {
-	bytes, _ := json.Marshal(fio)
+	bytes := fio.ToBytes()
 	return &sarama.ProducerMessage{
 		Topic: p.topic,
 		Value: sarama.ByteEncoder(bytes),

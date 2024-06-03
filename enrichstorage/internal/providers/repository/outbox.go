@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 	"enrichstorage/pkg/types"
+
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -23,24 +24,23 @@ func NewOutbox(db *gorm.DB) *Outbox {
 }
 
 func (o *Outbox) FIOComputeRequested(ctx context.Context, fio types.FIO) error {
-	rec := FioOutbox{Payload: fioToBytes(fio)}
+	rec := FioOutbox{Payload: fio.ToBytes()}
 	result := o.db.WithContext(ctx).Select("payload").Create(&rec)
 	return result.Error
 }
 
 func (o *Outbox) PullNextFIO(ctx context.Context, batchSize int) ([]types.FIO, error) {
-	var result []types.FIO
+	var resultBytes []FioOutbox
 	resDB := o.db.WithContext(ctx).
 		Limit(batchSize).
 		Clauses(clause.Locking{Strength: "UPDATE"}).
-		Find(&result)
+		Find(&resultBytes)
 	if resDB.Error != nil {
 		return nil, resDB.Error
 	}
-	return result, nil
-}
-
-func fioToBytes(fio types.FIO) []byte {
-	res, _ := json.Marshal(fio)
-	return res
+	fios := lo.Map(resultBytes, func(bytes FioOutbox, _ int) types.FIO {
+		fio, _ := types.FIOfromBytes(bytes.Payload)
+		return fio
+	})
+	return fios, nil
 }
