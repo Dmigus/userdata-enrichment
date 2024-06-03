@@ -14,15 +14,15 @@ type (
 		Sex         types.Sex
 		Nationality types.Nationality
 	}
-	repo interface {
+	Repository interface {
 		Get(ctx context.Context, req Request) ([]Result, error)
 	}
 	Getter struct {
-		repo repo
+		repo Repository
 	}
 )
 
-func NewGetter(repo repo) *Getter {
+func NewGetter(repo Repository) *Getter {
 	return &Getter{repo: repo}
 }
 

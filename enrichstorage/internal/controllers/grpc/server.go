@@ -11,17 +11,17 @@ import (
 )
 
 type (
-	service interface {
+	Service interface {
 		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
 		Update(ctx context.Context, rec types.EnrichedRecord) error
 	}
 	Server struct {
 		v1.UnimplementedEnrichStorageServer
-		service service
+		service Service
 	}
 )
 
-func NewServer(service service) *Server {
+func NewServer(service Service) *Server {
 	return &Server{service: service}
 }
 

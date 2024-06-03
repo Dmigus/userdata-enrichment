@@ -6,15 +6,15 @@ import (
 )
 
 type (
-	repo interface {
+	Repository interface {
 		Delete(ctx context.Context, key types.FIO) error
 	}
 	Deleter struct {
-		repo repo
+		repo Repository
 	}
 )
 
-func NewDeleter(repo repo) *Deleter {
+func NewDeleter(repo Repository) *Deleter {
 	return &Deleter{repo: repo}
 }
 

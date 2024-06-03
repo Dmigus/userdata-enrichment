@@ -15,16 +15,16 @@ type (
 	Outbox interface {
 		PullNextFIO(ctx context.Context, batchSize int) ([]types.FIO, error)
 	}
-	eventsPusher interface {
+	EventsPusher interface {
 		SendMessages(ctx context.Context, fios []types.FIO) error
 	}
-	txManager interface {
-		WithinTransaction(context.Context, func(ctx context.Context, outbox Outbox) bool) error
+	TxManager interface {
+		WithinTransactionOutbox(context.Context, func(ctx context.Context, outbox Outbox) bool) error
 	}
 	// Service представляет сервис, осуществляющий регулярную выгрузку ивентов из хранилища событий в брокер
 	Service struct {
-		tx           txManager
-		broker       eventsPusher
+		tx           TxManager
+		broker       EventsPusher
 		iterInterval time.Duration
 		batchSize    int
 		logger       *zap.Logger
@@ -32,7 +32,7 @@ type (
 )
 
 // NewService создаёт новый Service.
-func NewService(tx txManager, broker eventsPusher, iterInterval time.Duration, batchSize int, logger *zap.Logger) *Service {
+func NewService(tx TxManager, broker EventsPusher, iterInterval time.Duration, batchSize int, logger *zap.Logger) *Service {
 	return &Service{
 		tx:           tx,
 		broker:       broker,
@@ -63,7 +63,7 @@ func (s *Service) iteration(serviceLiveCtx context.Context) error {
 	iterCtx, cancel := context.WithCancel(serviceLiveCtx)
 	defer cancel()
 	var serviceErr error
-	trErr := s.tx.WithinTransaction(iterCtx, func(ctx context.Context, outbox Outbox) bool {
+	trErr := s.tx.WithinTransactionOutbox(iterCtx, func(ctx context.Context, outbox Outbox) bool {
 		events, err := outbox.PullNextFIO(ctx, s.batchSize)
 		if err != nil {
 			serviceErr = fmt.Errorf("could not pull events from outbox: %w", err)

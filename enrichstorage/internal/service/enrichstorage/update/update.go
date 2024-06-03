@@ -13,15 +13,15 @@ type (
 		NewSex                                        types.Sex
 		NewNat                                        types.Nationality
 	}
-	repo interface {
+	Repository interface {
 		Update(ctx context.Context, req Request) error
 	}
 	Updater struct {
-		repo repo
+		repo Repository
 	}
 )
 
-func NewUpdater(repo repo) *Updater {
+func NewUpdater(repo Repository) *Updater {
 	return &Updater{repo: repo}
 }
 
