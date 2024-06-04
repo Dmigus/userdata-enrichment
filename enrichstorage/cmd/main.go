@@ -4,6 +4,7 @@ package main
 import (
 	"enrichstorage/internal/apps/enrichstorage"
 	"enrichstorage/internal/apps/outboxsender"
+
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"

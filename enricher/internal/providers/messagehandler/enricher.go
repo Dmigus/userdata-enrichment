@@ -3,6 +3,7 @@ package messagehandler
 import (
 	"context"
 	"enrichstorage/pkg/types"
+
 	"golang.org/x/sync/errgroup"
 )
 

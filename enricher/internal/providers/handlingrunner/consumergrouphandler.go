@@ -2,7 +2,6 @@ package handlingrunner
 
 import (
 	"context"
-	"encoding/json"
 	"enricher/internal/service"
 	"enrichstorage/pkg/types"
 
@@ -52,7 +51,6 @@ func (c *consumerGroupHandler) processTracedMessage(sessionCtx context.Context, 
 }
 
 func messageToFIO(message *sarama.ConsumerMessage) types.FIO {
-	var fio types.FIO
-	_ = json.Unmarshal(message.Value, &fio)
+	fio, _ := types.FIOfromBytes(message.Value)
 	return fio
 }

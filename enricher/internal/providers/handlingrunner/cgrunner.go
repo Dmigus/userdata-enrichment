@@ -4,6 +4,7 @@ package handlingrunner
 import (
 	"context"
 	"enricher/internal/service"
+
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
 )

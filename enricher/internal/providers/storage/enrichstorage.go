@@ -5,6 +5,7 @@ import (
 	"enricher/internal/providers/storage/converters"
 	v1 "enricher/internal/providers/storage/protoc"
 	"enrichstorage/pkg/types"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -14,7 +15,7 @@ type EnrichStorage struct {
 }
 
 func NewEnrichStorage(addr string) (*EnrichStorage, error) {
-	conn, err := grpc.Dial(addr,
+	conn, err := grpc.NewClient(addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

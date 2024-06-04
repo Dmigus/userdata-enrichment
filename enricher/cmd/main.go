@@ -3,6 +3,7 @@ package main
 
 import (
 	"enricher/internal/app"
+
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"

@@ -14,14 +14,15 @@ import (
 	"enrichstorage/internal/service/enrichstorage/update"
 	"enrichstorage/internal/service/outboxsender"
 	"fmt"
+	"net"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"net"
-	"net/http"
 )
 
 var Module = fx.Module("enrichstorage",

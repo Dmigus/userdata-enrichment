@@ -7,9 +7,10 @@ import (
 	"enricher/internal/providers/messagehandler/computers"
 	"enricher/internal/providers/storage"
 	"enricher/internal/service"
+	"net/http"
+
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 var Module = fx.Module("app",

@@ -3,9 +3,10 @@ package outboxsender
 import (
 	"context"
 	"enrichstorage/internal/service/outboxsender"
+	"time"
+
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"time"
 )
 
 var Module = fx.Module("outboxsender",

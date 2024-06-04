@@ -1,7 +1,7 @@
 
 .PHONY:lint
 lint:
-	golangci-lint run --config=.golangci.yaml --new-from-rev=origin/master
+	golangci-lint run --config=.golangci.yaml --new-from-rev=origin/master --fix
 
 # Используем bin в текущей директории для установки плагинов protoc
 LOCAL_BIN:=$(CURDIR)/bin

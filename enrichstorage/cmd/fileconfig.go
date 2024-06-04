@@ -4,11 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/samber/lo"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"os"
-	"path/filepath"
 )
 
 const (
