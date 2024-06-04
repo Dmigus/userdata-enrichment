@@ -15,15 +15,19 @@ type (
 		Surname    string `json:"surname"`
 		Patronymic string `json:"patronymic"`
 	}
-	creator interface {
+	CreatorService interface {
 		Create(ctx context.Context, fio types.FIO) error
 	}
-	CreateHandler struct {
-		creator creator
+	Handler struct {
+		creator CreatorService
 	}
 )
 
-func (ch *CreateHandler) Handle(c *gin.Context) {
+func NewHandler(creator CreatorService) *Handler {
+	return &Handler{creator: creator}
+}
+
+func (ch *Handler) Handle(c *gin.Context) {
 	rec := request{}
 	if err := c.ShouldBindJSON(&rec); err != nil {
 		c.JSON(http.StatusBadRequest, c.Error(err))

@@ -19,15 +19,19 @@ type (
 		Sex         *string `json:"sex"`
 		Nationality *string `json:"nationality"`
 	}
-	updater interface {
+	UpdateService interface {
 		Update(ctx context.Context, rec update.Request) error
 	}
-	UpdateHandler struct {
-		updater updater
+	Handler struct {
+		updater UpdateService
 	}
 )
 
-func (ch *UpdateHandler) Handle(c *gin.Context) {
+func NewHandler(updater UpdateService) *Handler {
+	return &Handler{updater: updater}
+}
+
+func (ch *Handler) Handle(c *gin.Context) {
 	rec := request{}
 	if err := c.ShouldBindJSON(&rec); err != nil {
 		c.JSON(http.StatusBadRequest, c.Error(err))

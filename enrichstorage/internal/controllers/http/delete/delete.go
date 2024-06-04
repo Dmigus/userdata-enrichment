@@ -15,13 +15,17 @@ type (
 		Surname    string `json:"surname"`
 		Patronymic string `json:"patronymic"`
 	}
-	deleter interface {
+	DeleteService interface {
 		Delete(ctx context.Context, fio types.FIO) error
 	}
 	Handler struct {
-		deleter deleter
+		deleter DeleteService
 	}
 )
+
+func NewHandler(deleter DeleteService) *Handler {
+	return &Handler{deleter: deleter}
+}
 
 func (h *Handler) Handle(c *gin.Context) {
 	rec := request{}
