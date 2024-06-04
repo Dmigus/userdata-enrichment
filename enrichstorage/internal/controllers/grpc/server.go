@@ -4,6 +4,7 @@ import (
 	"context"
 	"enrichstorage/internal/controllers/grpc/converters"
 	v1 "enrichstorage/internal/controllers/grpc/protoc"
+	"enrichstorage/internal/service/enrichstorage/update"
 	"enrichstorage/pkg/types"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -11,18 +12,21 @@ import (
 )
 
 type (
-	Service interface {
+	PresenceChecker interface {
 		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
-		Update(ctx context.Context, rec types.EnrichedRecord) error
+	}
+	Updater interface {
+		Update(ctx context.Context, rec update.Request) error
 	}
 	Server struct {
 		v1.UnimplementedEnrichStorageServer
-		service Service
+		prChecker PresenceChecker
+		updater   Updater
 	}
 )
 
-func NewServer(service Service) *Server {
-	return &Server{service: service}
+func NewServer(prChecker PresenceChecker, updater Updater) *Server {
+	return &Server{prChecker: prChecker, updater: updater}
 }
 
 func (s *Server) IsFIOPresents(ctx context.Context, fioDTO *v1.FIO) (*wrapperspb.BoolValue, error) {
@@ -30,7 +34,7 @@ func (s *Server) IsFIOPresents(ctx context.Context, fioDTO *v1.FIO) (*wrapperspb
 	if err != nil {
 		return nil, err
 	}
-	isPresents, err := s.service.IsFIOPresents(ctx, fio)
+	isPresents, err := s.prChecker.IsFIOPresents(ctx, fio)
 	if err != nil {
 		return nil, err
 	}
@@ -42,6 +46,19 @@ func (s *Server) Update(ctx context.Context, enrichedDTO *v1.Enriched) (*emptypb
 	if err != nil {
 		return nil, err
 	}
-	err = s.service.Update(ctx, enriched)
+	enrichReq := enrichedToUpdateRequest(enriched)
+	err = s.updater.Update(ctx, enrichReq)
 	return &emptypb.Empty{}, err
+}
+
+func enrichedToUpdateRequest(enriched types.EnrichedRecord) update.Request {
+	return update.Request{
+		Fio:                 enriched.Fio,
+		NewAge:              enriched.Age,
+		NewNat:              enriched.Nationality,
+		NewSex:              enriched.Sex,
+		SexPresents:         true,
+		AgePresents:         true,
+		NationalityPresents: true,
+	}
 }

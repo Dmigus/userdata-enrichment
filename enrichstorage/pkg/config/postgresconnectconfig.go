@@ -1,20 +1,9 @@
-package app
+package config
 
 import (
 	"fmt"
 	"strings"
 )
-
-type Config struct {
-	Storage  PostgresConnectConfig `json:"Storage"`
-	GRPCPort int                   `json:"GRPCPort"`
-	DataBus  struct {
-		Brokers       []string `json:"Brokers"`
-		Topic         string   `json:"Topic"`
-		BatchSize     int      `json:"BatchSize"`
-		BatchInterval int      `json:"BatchInterval"`
-	} `json:"DataBus"`
-}
 
 type PostgresConnectConfig struct {
 	User     string `json:"User"`

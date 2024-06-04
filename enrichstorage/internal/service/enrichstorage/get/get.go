@@ -16,6 +16,7 @@ type (
 	}
 	Repository interface {
 		Get(ctx context.Context, req Request) ([]Result, error)
+		IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error)
 	}
 	Getter struct {
 		repo Repository
@@ -28,4 +29,8 @@ func NewGetter(repo Repository) *Getter {
 
 func (g *Getter) Get(ctx context.Context, req Request) ([]Result, error) {
 	return g.repo.Get(ctx, req)
+}
+
+func (g *Getter) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error) {
+	return g.repo.IsFIOPresents(ctx, fio)
 }
