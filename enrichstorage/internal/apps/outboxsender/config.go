@@ -8,6 +8,6 @@ type Config struct {
 		Brokers       []string `json:"Brokers"`
 		Topic         string   `json:"Topic"`
 		BatchSize     int      `json:"BatchSize"`
-		BatchInterval int      `json:"BatchInterval"`
+		BatchInterval int      `json:"batchInterval"`
 	} `json:"DataBus"`
 }

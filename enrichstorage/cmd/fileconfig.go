@@ -4,8 +4,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/samber/lo"
 	"github.com/spf13/pflag"
@@ -13,8 +11,7 @@ import (
 )
 
 const (
-	configNameFlag       = "config"
-	postgresPasswordFile = "postgresPasswordFile"
+	configNameFlag = "config"
 )
 
 func initViper() error {
@@ -25,7 +22,7 @@ func initViper() error {
 	if err != nil {
 		return fmt.Errorf("fatal error binding flags: %w", err)
 	}
-	_ = viper.BindEnv(postgresPasswordFile, `POSTGRES_PASSWORD_FILE`)
+	_ = viper.BindEnv(`Storage.Password`, `POSTGRES_PASSWORD`)
 	configName := viper.GetString(configNameFlag)
 	viper.SetConfigFile(configName)
 	err = viper.ReadInConfig() // Find and read the config file
@@ -33,22 +30,8 @@ func initViper() error {
 }
 
 func parseConfigs(configs ...any) error {
-	postgresPwd, err := readSecretFromFile(viper.GetString(postgresPasswordFile))
-	if err != nil {
-		return fmt.Errorf("error reading postgres password: %w", err)
-	}
-	viper.Set(`Repository.Password`, postgresPwd)
 	errs := lo.Map(configs, func(conf any, _ int) error {
 		return viper.Unmarshal(conf)
 	})
 	return errors.Join(errs...)
-}
-
-func readSecretFromFile(addr string) (string, error) {
-	cleaned := filepath.Clean(addr)
-	dataBytes, err := os.ReadFile(cleaned)
-	if err != nil {
-		return "", err
-	}
-	return string(dataBytes), nil
 }

@@ -12,8 +12,8 @@ import (
 
 type globResult struct {
 	fx.Out
-	enrichConfig       *enrichstorage.Config
-	outboxSenderConfig *outboxsender.Config
+	EnrichConfig       *enrichstorage.Config
+	OutboxSenderConfig *outboxsender.Config
 	Logger             *zap.Logger
 }
 
@@ -32,7 +32,7 @@ func initGlobalModule(lc fx.Lifecycle) (globResult, error) {
 		return globResult{}, err
 	}
 	lc.Append(fx.StopHook(logger.Sync))
-	return globResult{Logger: logger, enrichConfig: &enrichConfig, outboxSenderConfig: &outboxSenderConfig}, nil
+	return globResult{Logger: logger, EnrichConfig: &enrichConfig, OutboxSenderConfig: &outboxSenderConfig}, nil
 }
 
 func main() {

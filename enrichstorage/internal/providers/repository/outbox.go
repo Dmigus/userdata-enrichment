@@ -19,6 +19,10 @@ type (
 	}
 )
 
+func (FioOutbox) TableName() string {
+	return "fio_outbox"
+}
+
 func NewOutbox(db *gorm.DB) *Outbox {
 	return &Outbox{db: db}
 }

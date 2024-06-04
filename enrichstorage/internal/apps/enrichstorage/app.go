@@ -35,7 +35,6 @@ var Module = fx.Module("enrichstorage",
 			delete.NewDeleter,
 			fx.As(new(deletehandler.DeleteService)),
 		),
-
 		fx.Annotate(
 			update.NewUpdater,
 			fx.As(new(grpccontroller.Updater)),
@@ -58,7 +57,10 @@ var Module = fx.Module("enrichstorage",
 			fx.As(new(delete.Repository)),
 			fx.As(new(get.Repository)),
 		),
-		repository.NewTxManager,
+		fx.Annotate(
+			repository.NewTxManager,
+			fx.As(new(create.TxManager)),
+		),
 		grpccontroller.NewServer,
 		gRPCServer,
 		createhandler.NewHandler,
@@ -112,17 +114,17 @@ func gRPCServer(lc fx.Lifecycle, serv *grpccontroller.Server, config *Config) (*
 
 type ginHandlerParams struct {
 	fx.In
-	createHdlr *createhandler.Handler
-	deleteHdlr *deletehandler.Handler
-	updateHdlr *updatehandler.Handler
+	CreateHdlr *createhandler.Handler
+	DeleteHdlr *deletehandler.Handler
+	UpdateHdlr *updatehandler.Handler
 }
 
 func ginHandler(params ginHandlerParams) http.Handler {
 	router := gin.New()
 	router.Use(gin.Recovery())
-	router.POST("/records/create", params.createHdlr.Handle)
-	router.POST("/records/delete", params.deleteHdlr.Handle)
-	router.POST("/records/update", params.updateHdlr.Handle)
+	router.POST("/records/create", params.CreateHdlr.Handle)
+	router.POST("/records/delete", params.DeleteHdlr.Handle)
+	router.POST("/records/update", params.UpdateHdlr.Handle)
 	return router.Handler()
 }
 

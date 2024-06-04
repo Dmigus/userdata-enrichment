@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"enrichstorage/internal/service/enrichstorage/create"
+	"enrichstorage/internal/service/outboxsender"
 	"errors"
 
 	"gorm.io/gorm"
@@ -34,7 +35,7 @@ func (m *TxManager) WithinTransactionRecordsOutbox(ctx context.Context, scenario
 	return err
 }
 
-func (m *TxManager) WithinTransactionOutbox(ctx context.Context, scenario func(context.Context, create.Outbox) bool) error {
+func (m *TxManager) WithinTransactionOutbox(ctx context.Context, scenario func(context.Context, outboxsender.Outbox) bool) error {
 	err := m.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		ctx := tx.Statement.Context
 		outbox := NewOutbox(tx)

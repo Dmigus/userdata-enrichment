@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"enrichstorage/internal/service/enrichstorage/get"
+	"enrichstorage/internal/service/enrichstorage/update"
 	"enrichstorage/pkg/types"
 	"errors"
 	"time"
@@ -45,9 +47,19 @@ func (r *Records) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error
 	return false, result.Error
 }
 
-func (r *Records) Update(ctx context.Context, rec types.EnrichedRecord) error {
-	dbRec := Record{fio: rec.Fio, age: rec.Age, sex: rec.Sex, nationality: rec.Nationality}
-	result := r.db.WithContext(ctx).Select("age", "sex", "nationality").Updates(&dbRec)
+func (r *Records) Update(ctx context.Context, rec update.Request) error {
+	dbRec := Record{fio: rec.Fio, age: rec.NewAge, sex: rec.NewSex, nationality: rec.NewNat}
+	var updateFields []string
+	if rec.SexPresents {
+		updateFields = append(updateFields, "sex")
+	}
+	if rec.AgePresents {
+		updateFields = append(updateFields, "age")
+	}
+	if rec.NationalityPresents {
+		updateFields = append(updateFields, "nationality")
+	}
+	result := r.db.WithContext(ctx).Select(updateFields).Updates(&dbRec)
 	return result.Error
 }
 
@@ -61,4 +73,8 @@ func (r *Records) Delete(ctx context.Context, fio types.FIO) error {
 	dbRec := Record{fio: fio}
 	result := r.db.WithContext(ctx).Delete(&dbRec)
 	return result.Error
+}
+
+func (r *Records) Get(ctx context.Context, req get.Request) ([]get.Result, error) {
+	return nil, nil
 }

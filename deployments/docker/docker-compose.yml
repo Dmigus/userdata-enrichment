@@ -7,9 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-passwd
-    secrets:
-      - postgres-passwd
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD?err}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s
@@ -54,7 +52,3 @@ services:
       kafka0:
         condition: service_healthy
     command: "kafka-topics --create --topic requests --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092"
-
-secrets:
-  postgres-passwd:
-    file: ./db_password.txt

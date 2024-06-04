@@ -1,7 +1,7 @@
 
-.PHONY: migrate
-migrate:
-	@export POSTGRES_PASSWORD=$(shell cat ../deployments/db_password.txt) && \
+.PHONY: migrate-docker
+migrate-docker:
+	@export $(shell grep -v '^#' ../deployments/docker/.env)
 	sql-migrate up -config migrations/dbconfig.yml -env docker_env
 
 .PHONY:lint

@@ -10,3 +10,4 @@ coverage.html
 coverage.out
 vendor-proto/
 protoc-gen-*
+.env
