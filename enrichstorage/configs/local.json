@@ -11,5 +11,6 @@
       "Database": "postgres",
       "User": "postgres"
   },
-  "GRPCPort": "50051"
+  "GRPCPort": 50051,
+  "HTTPPort": 8081
 }

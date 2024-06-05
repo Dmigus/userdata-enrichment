@@ -42,6 +42,7 @@ func (ch *Handler) Handle(c *gin.Context) {
 	err = ch.creator.Create(c, fio)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, c.Error(err))
+		return
 	}
 	c.Status(http.StatusOK)
 }

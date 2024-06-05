@@ -12,12 +12,19 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+var keyFields = []string{"surname", "name", "patronymic"}
+
 type (
+	fioKey struct {
+		Name       string `gorm:"primaryKey"`
+		Surname    string `gorm:"primaryKey"`
+		Patronymic string `gorm:"primaryKey"`
+	}
 	Record struct {
-		fio         types.FIO `gorm:"embedded;primaryKey"`
-		age         types.Age
-		sex         types.Sex
-		nationality types.Nationality
+		Fio         fioKey `gorm:"embedded"`
+		Age         types.Age
+		Sex         types.Sex
+		Nationality types.Nationality
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
 	}
@@ -36,7 +43,7 @@ func (Record) TableName() string {
 }
 
 func (r *Records) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error) {
-	rec := Record{fio: fio}
+	rec := Record{Fio: fioKey{Name: fio.Name(), Surname: fio.Surname(), Patronymic: fio.Patronymic()}}
 	result := r.db.WithContext(ctx).First(&rec)
 	if result.Error == nil {
 		return true, nil
@@ -48,29 +55,36 @@ func (r *Records) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error
 }
 
 func (r *Records) Update(ctx context.Context, rec update.Request) error {
-	dbRec := Record{fio: rec.Fio, age: rec.NewAge, sex: rec.NewSex, nationality: rec.NewNat}
-	var updateFields []string
+	dbRec := Record{Fio: fioKey{
+		Name:       rec.Fio.Name(),
+		Surname:    rec.Fio.Surname(),
+		Patronymic: rec.Fio.Patronymic()},
+		Age:         rec.NewAge,
+		Sex:         rec.NewSex,
+		Nationality: rec.NewNat,
+	}
+	updateFields := make(map[string]any)
 	if rec.SexPresents {
-		updateFields = append(updateFields, "sex")
+		updateFields["sex"] = rec.NewSex
 	}
 	if rec.AgePresents {
-		updateFields = append(updateFields, "age")
+		updateFields["age"] = rec.NewAge
 	}
 	if rec.NationalityPresents {
-		updateFields = append(updateFields, "nationality")
+		updateFields["nationality"] = rec.NewNat
 	}
-	result := r.db.WithContext(ctx).Select(updateFields).Updates(&dbRec)
+	result := r.db.WithContext(ctx).Model(&dbRec).Updates(updateFields)
 	return result.Error
 }
 
 func (r *Records) Create(ctx context.Context, fio types.FIO) error {
-	dbRec := Record{fio: fio}
-	result := r.db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(&dbRec)
+	dbRec := Record{Fio: fioKey{Name: fio.Name(), Surname: fio.Surname(), Patronymic: fio.Patronymic()}}
+	result := r.db.WithContext(ctx).Select(keyFields).Clauses(clause.OnConflict{DoNothing: true}).Create(&dbRec)
 	return result.Error
 }
 
 func (r *Records) Delete(ctx context.Context, fio types.FIO) error {
-	dbRec := Record{fio: fio}
+	dbRec := Record{Fio: fioKey{Name: fio.Name(), Surname: fio.Surname(), Patronymic: fio.Patronymic()}}
 	result := r.db.WithContext(ctx).Delete(&dbRec)
 	return result.Error
 }

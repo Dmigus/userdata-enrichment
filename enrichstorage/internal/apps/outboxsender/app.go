@@ -75,8 +75,8 @@ func outboxSender(lc fx.Lifecycle, params outboxParams) *outboxsender.Service {
 	var lifecycleCtx context.Context
 	var cancel func()
 	done := make(chan struct{})
-	lc.Append(fx.StartStopHook(func(ctx context.Context) {
-		lifecycleCtx, cancel = context.WithCancel(ctx)
+	lc.Append(fx.StartStopHook(func() {
+		lifecycleCtx, cancel = context.WithCancel(context.Background())
 		go func() {
 			defer close(done)
 			sender.Run(lifecycleCtx)

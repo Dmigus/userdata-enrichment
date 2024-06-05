@@ -34,11 +34,22 @@ func (o *Outbox) FIOComputeRequested(ctx context.Context, fio types.FIO) error {
 }
 
 func (o *Outbox) PullNextFIO(ctx context.Context, batchSize int) ([]types.FIO, error) {
-	var resultBytes []FioOutbox
+	idsToDelete := []int64{}
 	resDB := o.db.WithContext(ctx).
+		Model(&FioOutbox{}).
+		Select("id").
 		Limit(batchSize).
 		Clauses(clause.Locking{Strength: "UPDATE"}).
-		Find(&resultBytes)
+		Order("id").
+		Find(&idsToDelete)
+	if resDB.Error != nil {
+		return nil, resDB.Error
+	}
+	var resultBytes []FioOutbox
+	resDB = o.db.WithContext(ctx).
+		Where("id IN ?", idsToDelete).
+		Clauses(clause.Returning{Columns: []clause.Column{{Name: "payload"}}}).
+		Delete(&resultBytes)
 	if resDB.Error != nil {
 		return nil, resDB.Error
 	}

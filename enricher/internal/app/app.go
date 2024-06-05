@@ -92,9 +92,9 @@ func setupServiceLifecycle(lc fx.Lifecycle, params serviceParams) *service.Enric
 	s := service.NewEnrichService(params.Runner, params.Enricher, params.Logger, params.Repo)
 	var cancelCtxFn context.CancelFunc
 	done := make(chan struct{})
-	lc.Append(fx.StartHook(func(ctx context.Context) {
+	lc.Append(fx.StartHook(func() {
 		var childCtx context.Context
-		childCtx, cancelCtxFn = context.WithCancel(ctx)
+		childCtx, cancelCtxFn = context.WithCancel(context.Background())
 		go func() {
 			defer close(done)
 			s.Run(childCtx)
@@ -124,5 +124,5 @@ func nationalityAddress(config *Config) string {
 }
 
 func enrichStorageAddress(config *Config) string {
-	return config.NationalityAddress
+	return config.EnrichStorageAddress
 }

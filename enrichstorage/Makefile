@@ -1,8 +1,8 @@
 
 .PHONY: migrate-docker
 migrate-docker:
-	@export $(shell grep -v '^#' ../deployments/docker/.env)
-	sql-migrate up -config migrations/dbconfig.yml -env docker_env
+	export $(shell grep -v '^#' ../deployments/docker/.env) && \
+	/Users/dmigus/go/bin/sql-migrate up -config migrations/dbconfig.yml -env docker_env
 
 .PHONY:lint
 lint:

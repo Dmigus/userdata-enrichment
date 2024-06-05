@@ -51,7 +51,9 @@ func (en *EnrichService) Run(ctx context.Context) {
 			return
 		}
 		err = en.repo.Update(ctx, enriched)
-		en.handleErr(ctx, fio, "err storing to repository", err)
+		if err != nil {
+			en.handleErr(ctx, fio, "err storing to repository", err)
+		}
 	}
 	en.runner.Run(ctx, handleFIOScenario)
 }
