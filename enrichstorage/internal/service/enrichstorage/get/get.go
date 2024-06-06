@@ -7,6 +7,8 @@ import (
 
 type (
 	Request struct {
+		Filters    Filters
+		Pagination Pagination
 	}
 	Result struct {
 		Key         types.FIO
