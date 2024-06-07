@@ -6,6 +6,7 @@ import (
 	v1 "enrichstorage/internal/controllers/grpc/protoc"
 	createhandler "enrichstorage/internal/controllers/http/create"
 	deletehandler "enrichstorage/internal/controllers/http/delete"
+	gethandler "enrichstorage/internal/controllers/http/get"
 	updatehandler "enrichstorage/internal/controllers/http/update"
 	"enrichstorage/internal/providers/repository"
 	"enrichstorage/internal/service/enrichstorage/create"
@@ -43,6 +44,7 @@ var Module = fx.Module("enrichstorage",
 		fx.Annotate(
 			get.NewGetter,
 			fx.As(new(grpccontroller.PresenceChecker)),
+			fx.As(new(gethandler.GetterService)),
 		),
 		getDB,
 		fx.Annotate(
@@ -58,6 +60,10 @@ var Module = fx.Module("enrichstorage",
 			fx.As(new(get.Repository)),
 		),
 		fx.Annotate(
+			func() *repository.FioComparator { return &repository.FioComparator{} },
+			fx.As(new(get.KeysComparator)),
+		),
+		fx.Annotate(
 			repository.NewTxManager,
 			fx.As(new(create.TxManager)),
 		),
@@ -66,6 +72,7 @@ var Module = fx.Module("enrichstorage",
 		createhandler.NewHandler,
 		deletehandler.NewHandler,
 		updatehandler.NewHandler,
+		gethandler.NewHandler,
 		ginHandler,
 		httpServer,
 	),
@@ -117,6 +124,7 @@ type ginHandlerParams struct {
 	CreateHdlr *createhandler.Handler
 	DeleteHdlr *deletehandler.Handler
 	UpdateHdlr *updatehandler.Handler
+	GetHdlr    *gethandler.Handler
 }
 
 func ginHandler(params ginHandlerParams) http.Handler {
@@ -125,6 +133,7 @@ func ginHandler(params ginHandlerParams) http.Handler {
 	router.POST("/records/create", params.CreateHdlr.Handle)
 	router.POST("/records/delete", params.DeleteHdlr.Handle)
 	router.POST("/records/update", params.UpdateHdlr.Handle)
+	router.GET("/records/get", params.GetHdlr.Handle)
 	return router.Handler()
 }
 

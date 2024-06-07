@@ -87,19 +87,41 @@ func (r *Records) Delete(ctx context.Context, fio types.FIO) error {
 	return result.Error
 }
 
-func (r *Records) Get(ctx context.Context, req get.Request) ([]get.Result, error) {
-	var records []Record
+func (r *Records) Get(ctx context.Context, req get.Request) ([]types.EnrichedRecord, error) {
+	var dbRecords []Record
 	db := r.db.WithContext(ctx)
 	db = setWhereFromFilters(db, req.Filters)
 	db = getPageFromPagination(db, req.Pagination)
-	res := db.Find(&records)
+	res := db.Find(&dbRecords)
 	if res.Error != nil {
 		return nil, res.Error
 	}
-	results := lo.Map(records, func(rec Record, _ int) get.Result {
-		return recordToGetResult(rec)
+	records := lo.Map(dbRecords, func(rec Record, _ int) types.EnrichedRecord {
+		return dbRecordToEnrichedRecord(rec)
 	})
-	return results, nil
+	return records, nil
+}
+
+func (r *Records) DoesHaveRecordsBefore(ctx context.Context, fio types.FIO) (bool, error) {
+	db := r.db.WithContext(ctx)
+	db = setBeforeCondition(db, fio)
+	var count int64
+	result := db.Model(&Record{}).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return count > 0, nil
+}
+
+func (r *Records) DoesHaveRecordsAfter(ctx context.Context, fio types.FIO) (bool, error) {
+	db := r.db.WithContext(ctx)
+	db = setAfterCondition(db, fio)
+	var count int64
+	result := db.Model(&Record{}).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return count > 0, nil
 }
 
 func setWhereFromFilters(db *gorm.DB, f get.Filters) *gorm.DB {
@@ -119,7 +141,7 @@ func setWhereFromFilters(db *gorm.DB, f get.Filters) *gorm.DB {
 		db = db.Where("nationality = ?", nat.Val)
 	}
 	if ageInterval, ok := f.AgeFilter(); ok {
-		db = db.Where("age BETWEEN ? AND ?", ageInterval.LTE, ageInterval.GTE)
+		db = db.Where("age BETWEEN ? AND ?", ageInterval.GTE, ageInterval.LTE)
 	}
 	return db
 }
@@ -128,20 +150,30 @@ func getPageFromPagination(db *gorm.DB, p get.Pagination) *gorm.DB {
 	db = db.Limit(p.Limit)
 	if lowLimit, ok := p.Before(); ok {
 		db = db.Order("surname desc, name desc, patronymic desc")
-		return db.Where("surname < ? OR surname = ? AND name < ? OR surname = ? AND name = ? AND patronymic < ?",
-			lowLimit.Surname(), lowLimit.Surname(), lowLimit.Name(), lowLimit.Surname(), lowLimit.Name(), lowLimit.Patronymic())
+		return setBeforeCondition(db, *lowLimit)
 	} else if highLimit, ok := p.After(); ok {
 		db = db.Order("surname asc, name asc, patronymic asc")
-		return db.Where("surname > ? OR surname = ? AND name > ? OR surname = ? AND name = ? AND patronymic > ?",
-			highLimit.Surname(), highLimit.Surname(), highLimit.Name(), highLimit.Surname(), highLimit.Name(), highLimit.Patronymic())
+		return setAfterCondition(db, *highLimit)
+	} else {
+		db = db.Order("surname asc, name asc, patronymic asc")
 	}
 	return db
 }
 
-func recordToGetResult(rec Record) get.Result {
+func setBeforeCondition(db *gorm.DB, fio types.FIO) *gorm.DB {
+	return db.Where(`surname < ? OR surname = ? AND name < ? OR surname = ? AND name = ? AND patronymic < ?`,
+		fio.Surname(), fio.Surname(), fio.Name(), fio.Surname(), fio.Name(), fio.Patronymic())
+}
+
+func setAfterCondition(db *gorm.DB, fio types.FIO) *gorm.DB {
+	return db.Where(`surname > ? OR surname = ? AND name > ? OR surname = ? AND name = ? AND patronymic >= ?`,
+		fio.Surname(), fio.Surname(), fio.Name(), fio.Surname(), fio.Name(), fio.Patronymic())
+}
+
+func dbRecordToEnrichedRecord(rec Record) types.EnrichedRecord {
 	fio, _ := types.NewFIO(rec.Fio.Name, rec.Fio.Surname, rec.Fio.Patronymic)
-	return get.Result{
-		Key:         fio,
+	return types.EnrichedRecord{
+		Fio:         fio,
 		Age:         rec.Age,
 		Sex:         rec.Sex,
 		Nationality: rec.Nationality,

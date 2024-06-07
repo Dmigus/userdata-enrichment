@@ -75,7 +75,7 @@ func (f *Filters) NatFilter() (*NationalityFilter, bool) {
 	return f.natFilter, f.natFilter != nil
 }
 
-func (f *Filters) SetNatFilter(natFilter *NationalityFilter) {
+func (f *Filters) SetNationalityFilter(natFilter *NationalityFilter) {
 	f.natFilter = natFilter
 }
 
