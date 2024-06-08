@@ -1,0 +1,139 @@
+{
+	"info": {
+		"_postman_id": "7c2765dd-dbb0-405b-a307-8076e2fd2a7e",
+		"name": "namedata-enrichment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33389187"
+	},
+	"item": [
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// {\n//     \"name\": \"Dmitriy\",\n//     \"surname\": \"Ushakov\",\n//     \"patronymic\": \"Vasilevich\"\n// }\n\n// {\n//     \"name\": \"Aleksandr\",\n//     \"surname\": \"Ushakov\",\n//     \"patronymic\": \"Vasilevich\"\n// }\n\n\n{\n    \"name\": \"Aleksandr\",\n    \"surname\": \"Ushakov\",\n    \"patronymic\": \"Vasilevich\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/records/create",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"records",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"surname\": \"Ushakov\",\n    \"name\": \"Aleksandr\",\n    \"patronymic\": \"Vasilevich\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/records/delete",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"records",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Dmitriy\",\n    \"surname\": \"Ushakov\",\n    \"patronymic\": \"Vasilevich\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/records/get?limit=1&age[gte]=40&sex=male",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"records",
+						"get"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "1"
+						},
+						{
+							"key": "age[gte]",
+							"value": "40"
+						},
+						{
+							"key": "sex",
+							"value": "male"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Dmitriy\",\n    \"surname\": \"Ushakov\",\n    \"patronymic\": \"Vasilevich\",\n    \"nationality\": \"chuvash\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/records/update",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"records",
+						"update"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
