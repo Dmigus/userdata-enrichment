@@ -16,7 +16,7 @@ type (
 		Val string
 	}
 	AgeFilter struct {
-		LTE, GTE types.Age
+		LTE, GTE *types.Age
 	}
 	NationalityFilter struct {
 		Val string
@@ -30,6 +30,22 @@ type (
 		natFilter        *NationalityFilter
 	}
 )
+
+func (af *AgeFilter) IsLtePresents() bool {
+	return af.LTE != nil
+}
+
+func (af *AgeFilter) GetLTE() types.Age {
+	return *af.LTE
+}
+
+func (af *AgeFilter) IsGtePresents() bool {
+	return af.GTE != nil
+}
+
+func (af *AgeFilter) GetGTE() types.Age {
+	return *af.GTE
+}
 
 func (f *Filters) NameFilter() (*NameFilter, bool) {
 	return f.nameFilter, f.nameFilter != nil

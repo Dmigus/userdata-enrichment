@@ -102,8 +102,9 @@ func (r *Records) Get(ctx context.Context, req get.Request) ([]types.EnrichedRec
 	return records, nil
 }
 
-func (r *Records) DoesHaveRecordsBefore(ctx context.Context, fio types.FIO) (bool, error) {
+func (r *Records) DoesHaveRecordsBefore(ctx context.Context, filters get.Filters, fio types.FIO) (bool, error) {
 	db := r.db.WithContext(ctx)
+	db = setWhereFromFilters(db, filters)
 	db = setBeforeCondition(db, fio)
 	var count int64
 	result := db.Model(&Record{}).Count(&count)
@@ -113,8 +114,9 @@ func (r *Records) DoesHaveRecordsBefore(ctx context.Context, fio types.FIO) (boo
 	return count > 0, nil
 }
 
-func (r *Records) DoesHaveRecordsAfter(ctx context.Context, fio types.FIO) (bool, error) {
+func (r *Records) DoesHaveRecordsAfter(ctx context.Context, filters get.Filters, fio types.FIO) (bool, error) {
 	db := r.db.WithContext(ctx)
+	db = setWhereFromFilters(db, filters)
 	db = setAfterCondition(db, fio)
 	var count int64
 	result := db.Model(&Record{}).Count(&count)
@@ -141,7 +143,12 @@ func setWhereFromFilters(db *gorm.DB, f get.Filters) *gorm.DB {
 		db = db.Where("nationality = ?", nat.Val)
 	}
 	if ageInterval, ok := f.AgeFilter(); ok {
-		db = db.Where("age BETWEEN ? AND ?", ageInterval.GTE, ageInterval.LTE)
+		if ageInterval.IsGtePresents() {
+			db = db.Where("age >= ?", ageInterval.GetGTE())
+		}
+		if ageInterval.IsLtePresents() {
+			db = db.Where("age <= ?", ageInterval.GetLTE())
+		}
 	}
 	return db
 }
@@ -166,7 +173,7 @@ func setBeforeCondition(db *gorm.DB, fio types.FIO) *gorm.DB {
 }
 
 func setAfterCondition(db *gorm.DB, fio types.FIO) *gorm.DB {
-	return db.Where(`surname > ? OR surname = ? AND name > ? OR surname = ? AND name = ? AND patronymic >= ?`,
+	return db.Where(`surname > ? OR surname = ? AND name > ? OR surname = ? AND name = ? AND patronymic > ?`,
 		fio.Surname(), fio.Surname(), fio.Name(), fio.Surname(), fio.Name(), fio.Patronymic())
 }
 

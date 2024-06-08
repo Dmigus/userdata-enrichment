@@ -51,10 +51,10 @@ func (r *request) filters() get.Filters {
 	if r.AgeGte != nil || r.AgeLte != nil {
 		filter := &get.AgeFilter{}
 		if r.AgeGte != nil {
-			filter.GTE = *r.AgeGte
+			filter.GTE = r.AgeGte
 		}
 		if r.AgeLte != nil {
-			filter.LTE = *r.AgeLte
+			filter.LTE = r.AgeLte
 		}
 		filters.SetAgeFilter(filter)
 	}
