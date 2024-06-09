@@ -80,7 +80,7 @@ type serviceParams struct {
 }
 
 func setupRunner(lc fx.Lifecycle, config *Config, logger *zap.Logger) (*handlingrunner.KafkaConsumerGroupRunner, error) {
-	runner, err := handlingrunner.NewKafkaConsumerGroupRunner(config.DataBus.Brokers, config.DataBus.Topic, logger)
+	runner, err := handlingrunner.NewKafkaConsumerGroupRunner(config.RequestEventBus.Brokers, config.RequestEventBus.Topic, logger)
 	if err != nil {
 		return nil, err
 	}

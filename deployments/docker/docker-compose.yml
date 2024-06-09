@@ -1,7 +1,6 @@
-version: "3.1"
+version: "2.27.0"
 services:
   enricher:
-    image: enricher
     build:
       context: ../../
       dockerfile: ./enricher/Dockerfile
@@ -9,15 +8,46 @@ services:
     depends_on:
       kafka0:
         condition: service_started
-#      enrichstrorage:
-#        condition: service_started
+      enrichstorage:
+        condition: service_started
     environment:
-      DATABUS_BROKERS: ${DATABUS_BROKERS}
-      DATABUS_TOPIC: ${DATABUS_TOPIC}
+      REQUEST_EVENT_BUS_BROKERS: ${REQUEST_EVENT_BUS_BROKERS}
+      REQUEST_EVENT_BUS_TOPIC: ${REQUEST_EVENT_BUS_TOPIC}
       AGIFY_ADDRESS: ${AGIFY_ADDRESS}
       GENDERIZE_ADDRESS: ${GENDERIZE_ADDRESS}
       NATIONALITY_ADDRESS: ${NATIONALITY_ADDRESS}
       ENRICH_STORAGE_ADDRESS: ${ENRICH_STORAGE_ADDRESS}
+#    networks:
+#      - broker
+
+  enrichstorage:
+    build:
+      context: ../../
+      dockerfile: ./enrichstorage/Dockerfile
+    ports:
+      - "8081:8081"
+    stop_signal: SIGTERM
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka-init-topics:
+        condition: service_completed_successfully
+
+    environment:
+      REQUEST_EVENT_BUS_BROKERS: ${REQUEST_EVENT_BUS_BROKERS}
+      REQUEST_EVENT_BUS_TOPIC: ${REQUEST_EVENT_BUS_TOPIC}
+      REQUEST_EVENT_BUS_BATCH_SIZE: ${REQUEST_EVENT_BUS_BATCH_SIZE}
+      REQUEST_EVENT_BUS_BATCH_INTERVAL: ${REQUEST_EVENT_BUS_BATCH_INTERVAL}
+      GRPCPORT: ${GRPCPORT}
+      HTTPPORT: ${HTTPPORT}
+      STORAGE_HOST: ${STORAGE_HOST}
+      STORAGE_PORT: ${STORAGE_PORT}
+      STORAGE_DATABASE: ${STORAGE_DATABASE}
+      STORAGE_USER: ${STORAGE_USER}
+      STORAGE_PASSWORD: ${STORAGE_PASSWORD}
+#    networks:
+#      - database
+#      - broker
 
 
 
@@ -28,17 +58,21 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD?err}
+      POSTGRES_PASSWORD: ${STORAGE_PASSWORD?err}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s
       timeout: 1s
       retries: 5
+#    networks:
+#      - database
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
       - "8080:8080"
+#    networks:
+#      - broker
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
@@ -47,7 +81,9 @@ services:
   kafka0:
     image: confluentinc/cp-kafka:7.6.0
     ports:
-      - 9092:9092
+      - "9092:9092"
+#    networks:
+#      - broker
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
@@ -73,3 +109,14 @@ services:
       kafka0:
         condition: service_healthy
     command: "kafka-topics --create --topic requests --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092"
+#    networks:
+#      - broker
+
+#networks:
+#  broker:
+#    name: broker-net
+#    driver: bridge
+#  database:
+#    name: db-net
+#    driver: bridge
+

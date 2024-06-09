@@ -2,10 +2,10 @@ package app
 
 // Config это конфигурация приложения
 type Config struct {
-	DataBus struct {
+	RequestEventBus struct {
 		Brokers []string `json:"Brokers"`
 		Topic   string   `json:"Topic"`
-	} `json:"DataBus"`
+	} `json:"RequestEventBus"`
 	AgifyAddress         string `json:"AgifyAddress"`
 	GenderizeAddress     string `json:"GenderizeAddress"`
 	NationalityAddress   string `json:"NationalityAddress"`

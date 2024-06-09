@@ -1,4 +1,4 @@
-/bin
+bin/
 /vendor
 /vendor.pb
 /vendor.protogen

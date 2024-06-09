@@ -18,24 +18,17 @@ var Module = fx.Module("outboxsender",
 			fx.ParamTags(`name:"brokers"`, `name:"topic"`),
 			fx.As(new(outboxsender.EventsPusher)),
 		),
-		namedDatabusFields,
+		namedRequestEventBusFields,
 		outboxSender,
 		fx.Annotate(
 			repository.NewTxManager,
 			fx.As(new(outboxsender.TxManager)),
 		),
-		//fx.Annotate(
-		//	batchSize,
-		//	fx.ResultTags(`name:"batchSize"`),
-		//),
-		//fx.Annotate(
-		//	batchInterval,
-		//	fx.ResultTags(`name:"batchInterval"`)),
 	),
 	fx.Invoke(func(_ *outboxsender.Service) {}),
 )
 
-type databusResult struct {
+type requestEventBusConfig struct {
 	fx.Out
 	Brokers       []string `name:"brokers"`
 	Topic         string   `name:"topic"`
@@ -43,22 +36,14 @@ type databusResult struct {
 	BatchInterval int      `name:"batchInterval"`
 }
 
-func namedDatabusFields(config *Config) databusResult {
-	return databusResult{
-		Brokers:       config.DataBus.Brokers,
-		Topic:         config.DataBus.Topic,
-		BatchSize:     config.DataBus.BatchSize,
-		BatchInterval: config.DataBus.BatchInterval,
+func namedRequestEventBusFields(config *Config) requestEventBusConfig {
+	return requestEventBusConfig{
+		Brokers:       config.RequestEventBus.Brokers,
+		Topic:         config.RequestEventBus.Topic,
+		BatchSize:     config.RequestEventBus.BatchSize,
+		BatchInterval: config.RequestEventBus.BatchInterval,
 	}
 }
-
-//func batchSize(config *Config) int {
-//	return config.DataBus.BatchSize
-//}
-//
-//func batchInterval(config *Config) int {
-//	return config.DataBus.BatchInterval
-//}
 
 type outboxParams struct {
 	fx.In
