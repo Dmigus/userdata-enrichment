@@ -1,5 +1,26 @@
 version: "3.1"
 services:
+  enricher:
+    image: enricher
+    build:
+      context: ../../
+      dockerfile: ./enricher/Dockerfile
+    stop_signal: SIGTERM
+    depends_on:
+      kafka0:
+        condition: service_started
+#      enrichstrorage:
+#        condition: service_started
+    environment:
+      DATABUS_BROKERS: ${DATABUS_BROKERS}
+      DATABUS_TOPIC: ${DATABUS_TOPIC}
+      AGIFY_ADDRESS: ${AGIFY_ADDRESS}
+      GENDERIZE_ADDRESS: ${GENDERIZE_ADDRESS}
+      NATIONALITY_ADDRESS: ${NATIONALITY_ADDRESS}
+      ENRICH_STORAGE_ADDRESS: ${ENRICH_STORAGE_ADDRESS}
+
+
+
   postgres:
     image: postgres:16.2-bullseye
     ports:
