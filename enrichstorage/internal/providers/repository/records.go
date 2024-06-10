@@ -6,9 +6,9 @@ import (
 	"enrichstorage/internal/service/enrichstorage/update"
 	"enrichstorage/pkg/types"
 	"errors"
-	"github.com/samber/lo"
 	"time"
 
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

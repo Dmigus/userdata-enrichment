@@ -6,8 +6,9 @@ import (
 	"encoding/json"
 	"enrichstorage/internal/service/enrichstorage/get"
 	"enrichstorage/pkg/types"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type (

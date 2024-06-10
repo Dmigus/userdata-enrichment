@@ -49,6 +49,9 @@ func (g *Getter) GetWithPaging(ctx context.Context, req Request) (Result, error)
 	} else {
 		before, after, err = g.compPagingForExisting(ctx, req, data)
 	}
+	if err != nil {
+		return Result{}, err
+	}
 	return Result{
 		Records:  data,
 		PrevPage: before,
