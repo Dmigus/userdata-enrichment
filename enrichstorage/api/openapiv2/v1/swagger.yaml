@@ -1,0 +1,96 @@
+basePath: /api/v1
+definitions:
+  create.request:
+    properties:
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    type: object
+  get.response:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/get.responseRecord'
+        type: array
+      paging:
+        properties:
+          next:
+            type: string
+          previous:
+            type: string
+        type: object
+    type: object
+  get.responseRecord:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      nationality:
+        type: string
+      patronymic:
+        type: string
+      sex:
+        type: string
+      surname:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact: {}
+  description: Сервис, который будет получать ФИО, из открытых апи обогащать ответ
+    наиболее вероятными возрастом, полом и национальностью.
+  title: Enricher
+  version: "1.0"
+paths:
+  /records/create:
+    post:
+      consumes:
+      - application/json
+      description: Создание новой записи на обогащение
+      parameters:
+      - description: ФИО
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/create.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Запись успешно создана
+      summary: Новая запись
+      tags:
+      - records
+  /records/get:
+    get:
+      consumes:
+      - application/json
+      description: Получение данных с различными фильтрами и пагинацией
+      parameters:
+      - description: name =
+        in: query
+        name: name
+        type: string
+      - description: age >=
+        in: query
+        name: age[gte]
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: resp
+          schema:
+            $ref: '#/definitions/get.response'
+      summary: Получение данных
+      tags:
+      - records
+swagger: "2.0"

@@ -1,4 +1,3 @@
-
 .PHONY: migrate-docker
 migrate-docker:
 	export $(shell grep -v '^#' ../deployments/docker/.env) && \
@@ -8,9 +7,17 @@ migrate-docker:
 lint:
 	golangci-lint run --config=.golangci.yaml --new-from-rev=origin/master --fix
 
-
-# Используем bin в текущей директории для установки плагинов protoc
+# Используем bin в текущей директории для установки плагинов
 LOCAL_BIN:=$(CURDIR)/bin
+
+bin/swag:
+	GOBIN=$(LOCAL_BIN) go install github.com/swaggo/swag/cmd/swag@v1.8.12
+
+.PHONY: swagger-init
+swagger-init: bin/swag
+	$(LOCAL_BIN)/swag init -g swagger.go --dir="./internal/apps/enrichstorage/,./internal/controllers/http/" \
+	--output="./api/openapiv2/v1/" \
+	--outputTypes="yaml"
 
 # Устанавливаем proto описания google/protobuf
 vendor-proto/google/protobuf:

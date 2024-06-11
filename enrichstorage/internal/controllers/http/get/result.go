@@ -21,10 +21,6 @@ type (
 	response struct {
 		Data   []responseRecord `json:"data"`
 		Paging struct {
-			//Cursor *struct {
-			//	After  string `json:"after"`
-			//	Before string `json:"before"`
-			//} `json:"cursor"`
 			Previous *string `json:"previous,omitempty"`
 			Next     *string `json:"next,omitempty"`
 		} `json:"paging"`

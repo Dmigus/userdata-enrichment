@@ -55,6 +55,7 @@ services:
     image: postgres:16.2-bullseye
     ports:
       - "5432:5432"
+    user: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres

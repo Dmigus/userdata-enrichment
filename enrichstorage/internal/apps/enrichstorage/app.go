@@ -15,10 +15,13 @@ import (
 	"enrichstorage/internal/service/enrichstorage/update"
 	"enrichstorage/internal/service/outboxsender"
 	"fmt"
+	swaggerFiles "github.com/swaggo/files"
 	"net"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -130,10 +133,18 @@ type ginHandlerParams struct {
 func ginHandler(params ginHandlerParams) http.Handler {
 	router := gin.New()
 	router.Use(gin.Recovery())
-	router.POST("/records/create", params.CreateHdlr.Handle)
-	router.POST("/records/delete", params.DeleteHdlr.Handle)
-	router.POST("/records/update", params.UpdateHdlr.Handle)
-	router.GET("/records/get", params.GetHdlr.Handle)
+	apiv1 := router.Group("/api/v1")
+	{
+		records := apiv1.Group("/records")
+		records.POST("/create", params.CreateHdlr.Handle)
+		records.POST("/delete", params.DeleteHdlr.Handle)
+		records.POST("/update", params.UpdateHdlr.Handle)
+		records.GET("/get", params.GetHdlr.Handle)
+	}
+	router.GET("/swagger/*any",
+		ginSwagger.WrapHandler(swaggerFiles.Handler,
+			ginSwagger.URL("api/openapiv2/v1/swagger.yaml"),
+		))
 	return router.Handler()
 }
 
