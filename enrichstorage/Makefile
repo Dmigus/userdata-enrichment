@@ -18,6 +18,9 @@ swagger-init: bin/swag
 	$(LOCAL_BIN)/swag init -g swagger.go --dir="./internal/apps/enrichstorage/,./internal/controllers/http/" \
 	--output="./api/openapiv2/v1/" \
 	--outputTypes="yaml"
+	$(LOCAL_BIN)/swag init -g swagger.go --dir="./internal/apps/enrichstorage/,./internal/controllers/http/" \
+    	--output="./internal/apps/enrichstorage/" \
+    	--outputTypes="go"
 
 # Устанавливаем proto описания google/protobuf
 vendor-proto/google/protobuf:

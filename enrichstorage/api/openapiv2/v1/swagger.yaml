@@ -8,6 +8,21 @@ definitions:
         type: string
       surname:
         type: string
+    required:
+    - name
+    - surname
+    type: object
+  delete.request:
+    properties:
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    required:
+    - name
+    - surname
     type: object
   get.response:
     properties:
@@ -37,6 +52,26 @@ definitions:
         type: string
       surname:
         type: string
+    type: object
+  update.request:
+    properties:
+      age:
+        maximum: 130
+        minimum: 0
+        type: integer
+      name:
+        type: string
+      nationality:
+        type: string
+      patronymic:
+        type: string
+      sex:
+        type: string
+      surname:
+        type: string
+    required:
+    - name
+    - surname
     type: object
 externalDocs:
   description: OpenAPI
@@ -69,6 +104,26 @@ paths:
       summary: Новая запись
       tags:
       - records
+  /records/delete:
+    post:
+      consumes:
+      - application/json
+      description: Удаление записи о ФИО
+      parameters:
+      - description: ФИО
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/delete.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Запись успешно удалена
+      summary: Удалить запись
+      tags:
+      - records
   /records/get:
     get:
       consumes:
@@ -79,10 +134,42 @@ paths:
         in: query
         name: name
         type: string
+      - description: surname =
+        in: query
+        name: surname
+        type: string
+      - description: patronymic =
+        in: query
+        name: patronymic
+        type: string
       - description: age >=
         in: query
         name: age[gte]
         type: integer
+      - description: age <=
+        in: query
+        name: age[lte]
+        type: integer
+      - description: sex =
+        in: query
+        name: sex
+        type: string
+      - description: nationality =
+        in: query
+        name: nationality
+        type: string
+      - description: limit =
+        in: query
+        name: limit
+        type: integer
+      - description: after =
+        in: query
+        name: after
+        type: string
+      - description: before =
+        in: query
+        name: before
+        type: string
       produces:
       - application/json
       responses:
@@ -91,6 +178,26 @@ paths:
           schema:
             $ref: '#/definitions/get.response'
       summary: Получение данных
+      tags:
+      - records
+  /records/update:
+    post:
+      consumes:
+      - application/json
+      description: Обновление записи для ФИО
+      parameters:
+      - description: ФИО
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/update.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Запись успешно изменена
+      summary: Обновить запись
       tags:
       - records
 swagger: "2.0"

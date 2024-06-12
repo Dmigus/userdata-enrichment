@@ -7,7 +7,7 @@ run-kafka:
 	cd deployments/docker && docker-compose up -d kafka-ui kafka0 kafka-init-topics
 
 .PHONY: run-all
-run-all:
+run-all: run-storage run-kafka
 	cd enricher && go build -o ./bin/app ./cmd
 	cd enrichstorage && go build -o ./bin/app ./cmd
 	cd deployments/docker && docker-compose build -q

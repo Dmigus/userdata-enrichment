@@ -139,21 +139,16 @@ type ginHandlerParams struct {
 func ginHandler(params ginHandlerParams) http.Handler {
 	router := gin.New()
 	router.Use(gin.Recovery())
-	apiv1 := router.Group("/api/v1")
+	records := router.Group("/api/v1/records")
 	{
-		records := apiv1.Group("/records")
 		records.POST("/create", params.CreateHdlr.Handle)
 		records.POST("/delete", params.DeleteHdlr.Handle)
 		records.POST("/update", params.UpdateHdlr.Handle)
 		records.GET("/get", params.GetHdlr.Handle)
-		apiv1.StaticFile("swagger.yaml", "api/openapiv2/v1/swagger.yaml")
 	}
-	swaggerGr := router.Group("/swagger")
-	swaggerGr.GET("/*any",
-		ginSwagger.WrapHandler(swaggerFiles.NewHandler(),
-			ginSwagger.URL(params.SwaggerURL),
-		))
-
+	router.GET("/swagger/*any",
+		ginSwagger.WrapHandler(swaggerFiles.NewHandler()),
+	)
 	return router.Handler()
 }
 

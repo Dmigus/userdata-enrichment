@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "// {\n//     \"name\": \"Dmitriy\",\n//     \"surname\": \"Ushakov\",\n//     \"patronymic\": \"Vasilevich\"\n// }\n\n// {\n//     \"name\": \"Aleksandr\",\n//     \"surname\": \"Ushakov\",\n//     \"patronymic\": \"Vasilevich\"\n// }\n\n\n{\n    \"name\": \"Aleksandr\",\n    \"surname\": \"Ushakov\",\n    \"patronymic\": \"Vasilevich\"\n}",
+					"raw": "{\n    \"name\": \"Dmitriy\",\n    \"surname\": \"Ushakov\",\n    \"patronymic\": \"Vasilevich\"\n}\n\n// {\n//     \"name\": \"Aleksandr\",\n//     \"surname\": \"Ushakov\",\n//     \"patronymic\": \"Vasilevich\"\n// }\n\n\n// {\n//     \"name\": \"Ivan\",\n//     \"surname\": \"Ushakov\",\n//     \"patronymic\": \"Vasilevich\"\n// }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -21,12 +21,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{host}}:{{port}}/records/create",
+					"raw": "{{host}}:{{port}}/api/v1/records/create",
 					"host": [
 						"{{host}}"
 					],
 					"port": "{{port}}",
 					"path": [
+						"api",
+						"v1",
 						"records",
 						"create"
 					]
@@ -49,12 +51,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{host}}:{{port}}/records/delete",
+					"raw": "{{host}}:{{port}}/api/v1/records/delete",
 					"host": [
 						"{{host}}"
 					],
 					"port": "{{port}}",
 					"path": [
+						"api",
+						"v1",
 						"records",
 						"delete"
 					]
@@ -80,12 +84,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{host}}:{{port}}/records/get?limit=1&age[gte]=40&sex=male",
+					"raw": "{{host}}:{{port}}/api/v1/records/get?limit=1&age[gte]=40&sex=male",
 					"host": [
 						"{{host}}"
 					],
 					"port": "{{port}}",
 					"path": [
+						"api",
+						"v1",
 						"records",
 						"get"
 					],
@@ -122,12 +128,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{host}}:{{port}}/records/update",
+					"raw": "{{host}}:{{port}}/api/v1/records/update",
 					"host": [
 						"{{host}}"
 					],
 					"port": "{{port}}",
 					"path": [
+						"api",
+						"v1",
 						"records",
 						"update"
 					]

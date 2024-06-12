@@ -5,19 +5,19 @@ import (
 	"enrichstorage/pkg/types"
 )
 
-const defaultLimit = 2
+const defaultPageSize = 2
 
 type request struct {
-	Surname     *string `form:"surname"`
-	Name        *string `form:"name"`
-	Patronymic  *string `form:"patronymic"`
-	Sex         *string `form:"sex"`
-	Nationality *string `form:"nationality"`
-	AgeGte      *int    `form:"age[gte]"`
-	AgeLte      *int    `form:"age[lte]"`
-	Limit       *int    `form:"limit"`
-	After       *string `form:"after"`
-	Before      *string `form:"before"`
+	Surname     *string `form:"surname"  validate:"optional"`
+	Name        *string `form:"name" validate:"optional"`
+	Patronymic  *string `form:"patronymic" validate:"optional"`
+	Sex         *string `form:"sex" validate:"optional"`
+	Nationality *string `form:"nationality" validate:"optional"`
+	AgeGte      *int    `form:"age[gte]" validate:"optional"`
+	AgeLte      *int    `form:"age[lte]" validate:"optional"`
+	Limit       *int    `form:"limit" validate:"optional"`
+	After       *string `form:"after" validate:"optional"`
+	Before      *string `form:"before" validate:"optional"`
 }
 
 func (r *request) ToUsecaseRequest() (*get.Request, error) {
@@ -62,7 +62,7 @@ func (r *request) filters() get.Filters {
 }
 
 func (r *request) pagination() (*get.Pagination, error) {
-	limit := defaultLimit
+	limit := defaultPageSize
 	if r.Limit != nil {
 		limit = *r.Limit
 	}

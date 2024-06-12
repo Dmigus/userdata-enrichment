@@ -11,9 +11,9 @@ import (
 
 type (
 	request struct {
-		Name       string `json:"name"`
-		Surname    string `json:"surname"`
-		Patronymic string `json:"patronymic"`
+		Name       string `json:"name" validate:"required"`
+		Surname    string `json:"surname" validate:"required"`
+		Patronymic string `json:"patronymic" validate:"optional"`
 	}
 	DeleteService interface {
 		Delete(ctx context.Context, fio types.FIO) error
