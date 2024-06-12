@@ -15,9 +15,10 @@ import (
 	"enrichstorage/internal/service/enrichstorage/update"
 	"enrichstorage/internal/service/outboxsender"
 	"fmt"
-	swaggerFiles "github.com/swaggo/files"
 	"net"
 	"net/http"
+
+	swaggerFiles "github.com/swaggo/files"
 
 	"github.com/gin-gonic/gin"
 
@@ -78,11 +79,6 @@ var Module = fx.Module("enrichstorage",
 		gethandler.NewHandler,
 		ginHandler,
 		httpServer,
-
-		fx.Annotate(
-			createSwaggerURL,
-			fx.ResultTags(`name:"swaggerURL"`),
-		),
 	),
 	fx.Invoke(func(*grpc.Server) {}),
 	fx.Invoke(func(*http.Server) {}),
@@ -133,7 +129,6 @@ type ginHandlerParams struct {
 	DeleteHdlr *deletehandler.Handler
 	UpdateHdlr *updatehandler.Handler
 	GetHdlr    *gethandler.Handler
-	SwaggerURL string `name:"swaggerURL"`
 }
 
 func ginHandler(params ginHandlerParams) http.Handler {

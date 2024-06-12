@@ -1,9 +1,7 @@
 package enrichstorage
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/url"
 )
 
 // @title          Enricher
@@ -15,15 +13,6 @@ import (
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
-
-func createSwaggerURL(config *Config) string {
-	obj := url.URL{
-		Scheme: "http",
-		Host:   fmt.Sprintf("localhost:%d", config.HTTPPort),
-		Path:   "api/v1/swagger.yaml",
-	}
-	return obj.String()
-}
 
 // GetRecords godoc
 //
