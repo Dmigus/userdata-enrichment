@@ -78,6 +78,11 @@ var Module = fx.Module("enrichstorage",
 		gethandler.NewHandler,
 		ginHandler,
 		httpServer,
+
+		fx.Annotate(
+			createSwaggerURL,
+			fx.ResultTags(`name:"swaggerURL"`),
+		),
 	),
 	fx.Invoke(func(*grpc.Server) {}),
 	fx.Invoke(func(*http.Server) {}),
@@ -128,6 +133,7 @@ type ginHandlerParams struct {
 	DeleteHdlr *deletehandler.Handler
 	UpdateHdlr *updatehandler.Handler
 	GetHdlr    *gethandler.Handler
+	SwaggerURL string `name:"swaggerURL"`
 }
 
 func ginHandler(params ginHandlerParams) http.Handler {
@@ -140,11 +146,14 @@ func ginHandler(params ginHandlerParams) http.Handler {
 		records.POST("/delete", params.DeleteHdlr.Handle)
 		records.POST("/update", params.UpdateHdlr.Handle)
 		records.GET("/get", params.GetHdlr.Handle)
+		apiv1.StaticFile("swagger.yaml", "api/openapiv2/v1/swagger.yaml")
 	}
-	router.GET("/swagger/*any",
-		ginSwagger.WrapHandler(swaggerFiles.Handler,
-			ginSwagger.URL("api/openapiv2/v1/swagger.yaml"),
+	swaggerGr := router.Group("/swagger")
+	swaggerGr.GET("/*any",
+		ginSwagger.WrapHandler(swaggerFiles.NewHandler(),
+			ginSwagger.URL(params.SwaggerURL),
 		))
+
 	return router.Handler()
 }
 

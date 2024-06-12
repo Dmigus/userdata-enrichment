@@ -41,7 +41,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8080
+host: localhost:8081
 info:
   contact: {}
   description: Сервис, который будет получать ФИО, из открытых апи обогащать ответ

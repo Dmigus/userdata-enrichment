@@ -1,16 +1,29 @@
 package enrichstorage
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"net/url"
+)
 
 // @title          Enricher
 // @version         1.0
 // @description     Сервис, который будет получать ФИО, из открытых апи обогащать ответ наиболее вероятными возрастом, полом и национальностью.
 
-// @host      localhost:8080
+// @host      localhost:8081
 // @BasePath  /api/v1
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
+
+func createSwaggerURL(config *Config) string {
+	obj := url.URL{
+		Scheme: "http",
+		Host:   fmt.Sprintf("localhost:%d", config.HTTPPort),
+		Path:   "api/v1/swagger.yaml",
+	}
+	return obj.String()
+}
 
 // GetRecords godoc
 //
