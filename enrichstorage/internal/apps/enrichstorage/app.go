@@ -79,6 +79,10 @@ var Module = fx.Module("enrichstorage",
 		gethandler.NewHandler,
 		ginHandler,
 		httpServer,
+		fx.Annotate(
+			getAuthorizationMiddleware,
+			fx.ResultTags(`name:"authMW"`),
+		),
 	),
 	fx.Invoke(func(*grpc.Server) {}),
 	fx.Invoke(func(*http.Server) {}),
@@ -129,12 +133,14 @@ type ginHandlerParams struct {
 	DeleteHdlr *deletehandler.Handler
 	UpdateHdlr *updatehandler.Handler
 	GetHdlr    *gethandler.Handler
+	AuthMW     gin.HandlerFunc `name:"authMW"`
 }
 
 func ginHandler(params ginHandlerParams) http.Handler {
 	router := gin.New()
 	router.Use(gin.Recovery())
 	records := router.Group("/api/v1/records")
+	records.Use(params.AuthMW)
 	{
 		records.POST("/create", params.CreateHdlr.Handle)
 		records.POST("/delete", params.DeleteHdlr.Handle)

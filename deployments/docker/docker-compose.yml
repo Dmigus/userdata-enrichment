@@ -121,3 +121,33 @@ services:
 #    name: db-net
 #    driver: bridge
 
+  keycloak:
+    image: keycloak/keycloak:25.0.0
+    ports:
+      - "8085:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      KC_HEALTH_ENABLED: true
+    command:
+      - start-dev
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  keycloak-init:
+    image: keycloak/keycloak:25.0.0
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    entrypoint: /keycloak-setup/script.sh
+    volumes:
+      - ./keycloak-setup:/keycloak-setup
+
+
+
