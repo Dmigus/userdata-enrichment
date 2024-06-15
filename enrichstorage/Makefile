@@ -13,8 +13,8 @@ LOCAL_BIN:=$(CURDIR)/bin
 bin/swag:
 	GOBIN=$(LOCAL_BIN) go install github.com/swaggo/swag/cmd/swag@v1.8.12
 
-.PHONY: swagger-init
-swagger-init: bin/swag
+.PHONY: swagger-generate
+swagger-generate: bin/swag
 	$(LOCAL_BIN)/swag init -g swagger.go --dir="./internal/apps/enrichstorage/,./internal/controllers/http/" \
 	--output="./api/openapiv2/v1/" \
 	--outputTypes="yaml"

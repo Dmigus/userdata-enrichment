@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/records/create": {
             "post": {
+                "security": [
+                    {
+                        "OAuth2": []
+                    }
+                ],
                 "description": "Создание новой записи на обогащение",
                 "consumes": [
                     "application/json"
@@ -49,6 +54,11 @@ const docTemplate = `{
         },
         "/records/delete": {
             "post": {
+                "security": [
+                    {
+                        "OAuth2": []
+                    }
+                ],
                 "description": "Удаление записи о ФИО",
                 "consumes": [
                     "application/json"
@@ -80,6 +90,11 @@ const docTemplate = `{
         },
         "/records/get": {
             "get": {
+                "security": [
+                    {
+                        "OAuth2": []
+                    }
+                ],
                 "description": "Получение данных с различными фильтрами и пагинацией",
                 "consumes": [
                     "application/json"
@@ -165,6 +180,11 @@ const docTemplate = `{
         },
         "/records/update": {
             "post": {
+                "security": [
+                    {
+                        "OAuth2": []
+                    }
+                ],
                 "description": "Обновление записи для ФИО",
                 "consumes": [
                     "application/json"
@@ -307,9 +327,12 @@ const docTemplate = `{
             }
         }
     },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
+    "securityDefinitions": {
+        "OAuth2": {
+            "type": "oauth2",
+            "flow": "password",
+            "tokenUrl": "http://localhost:8085/realms/enricherrealm/protocol/openid-connect/token"
+        }
     }
 }`
 

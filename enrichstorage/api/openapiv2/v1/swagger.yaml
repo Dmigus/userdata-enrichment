@@ -73,9 +73,6 @@ definitions:
     - name
     - surname
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
 host: localhost:8081
 info:
   contact: {}
@@ -101,6 +98,8 @@ paths:
       responses:
         "200":
           description: Запись успешно создана
+      security:
+      - OAuth2: []
       summary: Новая запись
       tags:
       - records
@@ -121,6 +120,8 @@ paths:
       responses:
         "200":
           description: Запись успешно удалена
+      security:
+      - OAuth2: []
       summary: Удалить запись
       tags:
       - records
@@ -177,6 +178,8 @@ paths:
           description: resp
           schema:
             $ref: '#/definitions/get.response'
+      security:
+      - OAuth2: []
       summary: Получение данных
       tags:
       - records
@@ -197,7 +200,14 @@ paths:
       responses:
         "200":
           description: Запись успешно изменена
+      security:
+      - OAuth2: []
       summary: Обновить запись
       tags:
       - records
+securityDefinitions:
+  OAuth2:
+    flow: password
+    tokenUrl: http://localhost:8085/realms/enricherrealm/protocol/openid-connect/token
+    type: oauth2
 swagger: "2.0"

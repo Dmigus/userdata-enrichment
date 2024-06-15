@@ -21,7 +21,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 
 	"github.com/gin-gonic/gin"
-
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -136,7 +135,7 @@ type ginHandlerParams struct {
 	AuthMW     gin.HandlerFunc `name:"authMW"`
 }
 
-func ginHandler(params ginHandlerParams) http.Handler {
+func ginHandler(params ginHandlerParams, config *Config) http.Handler {
 	router := gin.New()
 	router.Use(gin.Recovery())
 	records := router.Group("/api/v1/records")
@@ -148,7 +147,10 @@ func ginHandler(params ginHandlerParams) http.Handler {
 		records.GET("/get", params.GetHdlr.Handle)
 	}
 	router.GET("/swagger/*any",
-		ginSwagger.WrapHandler(swaggerFiles.NewHandler()),
+		ginSwagger.WrapHandler(
+			swaggerFiles.NewHandler(),
+			ginSwagger.Oauth2DefaultClientID(config.Keycloak.ClientId),
+		),
 	)
 	return router.Handler()
 }

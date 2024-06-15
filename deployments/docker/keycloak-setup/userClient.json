@@ -14,12 +14,12 @@
     "http://localhost:8980/myapp/*"
   ],
   "webOrigins": [
-    "http://localhost:8980"
+    "*"
   ],
   "notBefore": 0,
   "bearerOnly": false,
   "consentRequired": false,
-  "standardFlowEnabled": false,
+  "standardFlowEnabled": true,
   "implicitFlowEnabled": false,
   "directAccessGrantsEnabled": true,
   "serviceAccountsEnabled": false,
@@ -41,7 +41,10 @@
     "require.pushed.authorization.requests": "false",
     "acr.loa.map": "{}",
     "display.on.consent.screen": "false",
-    "token.response.type.bearer.lower-case": "false"
+    "token.response.type.bearer.lower-case": "false",
+    "login_theme": "",
+    "consent.screen.text": "",
+    "backchannel.logout.url": ""
   },
   "authenticationFlowBindingOverrides": {},
   "fullScopeAllowed": true,
@@ -64,5 +67,6 @@
     "view": true,
     "configure": true,
     "manage": true
-  }
+  },
+  "authorizationServicesEnabled": false
 }
