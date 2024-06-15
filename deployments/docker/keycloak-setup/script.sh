@@ -1,6 +1,6 @@
 #!/bin/sh
 
-${HOME}/bin/kcadm.sh config credentials  --server http://keycloak:8080 --realm master --user ${KEYCLOAK_ADMIN} --password ${KEYCLOAK_ADMIN_PASSWORD}
+${HOME}/bin/kcadm.sh config credentials  --server ${KEYCLOAK_URL} --realm master --user ${KEYCLOAK_ADMIN} --password ${KEYCLOAK_ADMIN_PASSWORD}
 ${HOME}/bin/kcadm.sh create realms -s realm=enricherrealm -s enabled=true
 CID=$(${HOME}/bin/kcadm.sh create clients -r enricherrealm -f /keycloak-setup/userClient.json --id)
 ${HOME}/bin/kcadm.sh create users -r enricherrealm -f /keycloak-setup/user.json

@@ -32,6 +32,8 @@ services:
         condition: service_healthy
       kafka-init-topics:
         condition: service_completed_successfully
+      keycloak-init:
+        condition: service_completed_successfully
 
     environment:
       REQUEST_EVENT_BUS_BROKERS: ${REQUEST_EVENT_BUS_BROKERS}
@@ -45,6 +47,10 @@ services:
       STORAGE_DATABASE: ${STORAGE_DATABASE}
       STORAGE_USER: ${STORAGE_USER}
       STORAGE_PASSWORD: ${STORAGE_PASSWORD}
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_ROLES_TO_PERMIT: ${KEYCLOAK_ROLES_TO_PERMIT}
 #    networks:
 #      - database
 #      - broker
@@ -142,6 +148,7 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
     depends_on:
       keycloak:
         condition: service_healthy

@@ -7,11 +7,13 @@ import (
 
 func getAuthorizationMiddleware(config *Config) gin.HandlerFunc {
 	keycloakConfig := ginkeycloak.BuilderConfig{
-		Service: "enricher",
-		Url:     "<your token url>",
-		Realm:   "<your realm to get the public keys>",
+		Service: config.Keycloak.ClientId,
+		Url:     config.Keycloak.Url,
+		Realm:   config.Keycloak.Realm,
 	}
-	return ginkeycloak.NewAccessBuilder(keycloakConfig).
-		RestrictButForRole("user").
-		Build()
+	builder := ginkeycloak.NewAccessBuilder(keycloakConfig)
+	for _, role := range config.Keycloak.RolesToPermit {
+		builder = builder.RestrictButForRole(role)
+	}
+	return builder.Build()
 }
