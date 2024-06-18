@@ -79,12 +79,18 @@ type serviceParams struct {
 	Repo     service.Storage
 }
 
-func setupRunner(lc fx.Lifecycle, config *Config, logger *zap.Logger) (*handlingrunner.KafkaConsumerGroupRunner, error) {
-	runner, err := handlingrunner.NewKafkaConsumerGroupRunner(config.RequestEventBus.Brokers, config.RequestEventBus.Topic, logger)
+func setupRunner(config *Config, logger *zap.Logger) (*handlingrunner.RabbitRunner, error) {
+	runner, err := handlingrunner.NewRabbitRunner(
+		config.RequestEventBus.Brokers[0],
+		config.RequestEventBus.Topic,
+		handlingrunner.RabbitCreds{
+			config.RequestEventBus.Username,
+			config.RequestEventBus.Password,
+		},
+		logger)
 	if err != nil {
 		return nil, err
 	}
-	lc.Append(fx.StopHook(runner.Close))
 	return runner, nil
 }
 

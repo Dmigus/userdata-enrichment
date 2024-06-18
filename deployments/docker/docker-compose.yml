@@ -17,6 +17,8 @@ services:
       GENDERIZE_ADDRESS: ${GENDERIZE_ADDRESS}
       NATIONALITY_ADDRESS: ${NATIONALITY_ADDRESS}
       ENRICH_STORAGE_ADDRESS: ${ENRICH_STORAGE_ADDRESS}
+      REQUEST_EVENT_BUS_USERNAME: ${REQUEST_EVENT_BUS_USERNAME}
+      REQUEST_EVENT_BUS_PASSWORD: ${REQUEST_EVENT_BUS_PASSWORD}
 #    networks:
 #      - broker
 
@@ -155,6 +157,19 @@ services:
     entrypoint: /keycloak-setup/script.sh
     volumes:
       - ./keycloak-setup:/keycloak-setup
+
+  rabbitmq:
+    image: rabbitmq:3.13.3-management
+    hostname: myrabbit
+    environment:
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_CONFIG_FILE=/rabbit-setup/rabbitmq.conf
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ./rabbit-mq/conf:/rabbit-setup
 
 
 

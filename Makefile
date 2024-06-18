@@ -8,6 +8,10 @@ run-storage-docker:
 run-kafka-docker:
 	cd deployments/docker && docker-compose up -d --force-recreate kafka-ui kafka0 kafka-init-topics
 
+.PHONY: run-rabbit-docker
+run-rabbit-docker:
+	cd deployments/docker && docker-compose up -d --force-recreate rabbitmq
+
 .PHONY: run-keycloak-docker
 run-keycloak-docker:
 	cd deployments/docker && docker-compose up -d --wait  --force-recreate  keycloak keycloak-init
