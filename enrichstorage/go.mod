@@ -5,7 +5,6 @@ go 1.22
 require (
 	github.com/IBM/sarama v1.43.2
 	github.com/gin-gonic/gin v1.10.0
-	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/samber/lo v1.39.0
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/files v1.0.1
@@ -13,6 +12,7 @@ require (
 	github.com/swaggo/swag v1.8.12
 	github.com/tbaehler/gin-keycloak v1.6.0
 	github.com/vrischmann/envconfig v1.3.0
+	github.com/wagslane/go-rabbitmq v0.13.0
 	go.uber.org/fx v1.22.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.64.0
@@ -74,6 +74,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect

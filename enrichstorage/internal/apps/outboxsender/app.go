@@ -33,7 +33,7 @@ func newSender(lc fx.Lifecycle, config *Config, logger *zap.Logger) (outboxsende
 	if err != nil {
 		return nil, err
 	}
-	lc.Append(fx.StopHook(func() error { return sender.Close() }))
+	lc.Append(fx.StopHook(func() { sender.Close() }))
 	return sender, nil
 }
 
