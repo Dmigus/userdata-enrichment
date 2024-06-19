@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"enricher/internal/providers/handlingrunner"
+	"enricher/internal/providers/handlingrunner/rabbit"
 	"enricher/internal/providers/messagehandler"
 	"enricher/internal/providers/messagehandler/computers"
 	"enricher/internal/providers/storage"
@@ -79,11 +79,11 @@ type serviceParams struct {
 	Repo     service.Storage
 }
 
-func setupRunner(config *Config, logger *zap.Logger) (*handlingrunner.RabbitRunner, error) {
-	runner, err := handlingrunner.NewRabbitRunner(
+func setupRunner(config *Config, logger *zap.Logger) (*rabbit.RabbitRunner, error) {
+	runner, err := rabbit.NewRabbitRunner(
 		config.RequestEventBus.Brokers[0],
 		config.RequestEventBus.Topic,
-		handlingrunner.RabbitCreds{
+		rabbit.RabbitCreds{
 			config.RequestEventBus.Username,
 			config.RequestEventBus.Password,
 		},

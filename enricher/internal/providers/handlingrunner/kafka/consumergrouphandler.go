@@ -1,4 +1,4 @@
-package handlingrunner
+package kafka
 
 import (
 	"context"

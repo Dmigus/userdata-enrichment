@@ -1,5 +1,5 @@
 // Package handlingrunner содержит функциональность, которая позволяет запустить обработку событий, получаемых из некоторого источника
-package handlingrunner
+package kafka
 
 import (
 	"context"
