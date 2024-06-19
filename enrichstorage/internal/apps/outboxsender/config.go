@@ -9,5 +9,7 @@ type Config struct {
 		Topic         string   `json:"Topic"`
 		BatchSize     int      `json:"BatchSize"`
 		BatchInterval int      `json:"batchInterval"`
+		Username      string
+		Password      string
 	} `json:"RequestEventBus"`
 }

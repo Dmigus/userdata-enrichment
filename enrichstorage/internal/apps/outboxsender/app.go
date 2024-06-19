@@ -2,7 +2,7 @@ package outboxsender
 
 import (
 	"context"
-	"enrichstorage/internal/providers/kafka"
+	"enrichstorage/internal/providers/rabbit"
 	"enrichstorage/internal/providers/repository"
 	"enrichstorage/internal/service/outboxsender"
 	"time"
@@ -13,12 +13,7 @@ import (
 
 var Module = fx.Module("outboxsender",
 	fx.Provide(
-		fx.Annotate(
-			kafka.NewSender,
-			fx.ParamTags(`name:"brokers"`, `name:"topic"`),
-			fx.As(new(outboxsender.EventsPusher)),
-		),
-		namedRequestEventBusFields,
+		newSender,
 		outboxSender,
 		fx.Annotate(
 			repository.NewTxManager,
@@ -28,35 +23,31 @@ var Module = fx.Module("outboxsender",
 	fx.Invoke(func(_ *outboxsender.Service) {}),
 )
 
-type requestEventBusConfig struct {
-	fx.Out
-	Brokers       []string `name:"brokers"`
-	Topic         string   `name:"topic"`
-	BatchSize     int      `name:"batchSize"`
-	BatchInterval int      `name:"batchInterval"`
-}
-
-func namedRequestEventBusFields(config *Config) requestEventBusConfig {
-	return requestEventBusConfig{
-		Brokers:       config.RequestEventBus.Brokers,
-		Topic:         config.RequestEventBus.Topic,
-		BatchSize:     config.RequestEventBus.BatchSize,
-		BatchInterval: config.RequestEventBus.BatchInterval,
+func newSender(lc fx.Lifecycle, config *Config, logger *zap.Logger) (outboxsender.EventsPusher, error) {
+	sender, err := rabbit.NewSender(
+		config.RequestEventBus.Brokers[0],
+		config.RequestEventBus.Topic,
+		rabbit.RabbitCreds{Name: config.RequestEventBus.Username, Password: config.RequestEventBus.Password},
+		logger,
+	)
+	if err != nil {
+		return nil, err
 	}
+	lc.Append(fx.StopHook(func() error { return sender.Close() }))
+	return sender, nil
 }
 
 type outboxParams struct {
 	fx.In
-	Tx            outboxsender.TxManager
-	Broker        outboxsender.EventsPusher
-	BatchInterval int `name:"batchInterval"`
-	BatchSize     int `name:"batchSize"`
-	Logger        *zap.Logger
+	Tx     outboxsender.TxManager
+	Broker outboxsender.EventsPusher
+	Config *Config
+	Logger *zap.Logger
 }
 
 func outboxSender(lc fx.Lifecycle, params outboxParams) *outboxsender.Service {
-	iterInterval := time.Duration(params.BatchInterval) * time.Second
-	sender := outboxsender.NewService(params.Tx, params.Broker, iterInterval, params.BatchSize, params.Logger)
+	iterInterval := time.Duration(params.Config.RequestEventBus.BatchInterval) * time.Second
+	sender := outboxsender.NewService(params.Tx, params.Broker, iterInterval, params.Config.RequestEventBus.BatchSize, params.Logger)
 	var lifecycleCtx context.Context
 	var cancel func()
 	done := make(chan struct{})

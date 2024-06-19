@@ -46,7 +46,7 @@ func NewService(tx TxManager, broker EventsPusher, iterInterval time.Duration, b
 func (s *Service) Run(ctx context.Context) {
 	t := time.NewTicker(s.iterInterval)
 	defer t.Stop()
-	for {
+	for ctx.Err() == nil {
 		select {
 		case <-ctx.Done():
 			return
@@ -57,6 +57,7 @@ func (s *Service) Run(ctx context.Context) {
 			}
 		}
 	}
+	s.logger.Error("exiting")
 }
 
 func (s *Service) iteration(serviceLiveCtx context.Context) error {
