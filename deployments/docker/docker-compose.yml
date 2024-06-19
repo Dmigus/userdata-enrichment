@@ -6,7 +6,7 @@ services:
       dockerfile: ./enricher/Dockerfile
     stop_signal: SIGTERM
     depends_on:
-      kafka0:
+      rabbitmq:
         condition: service_started
       enrichstorage:
         condition: service_started
@@ -17,8 +17,8 @@ services:
       GENDERIZE_ADDRESS: ${GENDERIZE_ADDRESS}
       NATIONALITY_ADDRESS: ${NATIONALITY_ADDRESS}
       ENRICH_STORAGE_ADDRESS: ${ENRICH_STORAGE_ADDRESS}
-      REQUEST_EVENT_BUS_USERNAME: ${REQUEST_EVENT_BUS_USERNAME}
-      REQUEST_EVENT_BUS_PASSWORD: ${REQUEST_EVENT_BUS_PASSWORD}
+      REQUEST_EVENT_BUS_USERNAME: ${REQUEST_EVENT_BUS_READER_USERNAME}
+      REQUEST_EVENT_BUS_PASSWORD: ${REQUEST_EVENT_BUS_READER_PASSWORD}
 #    networks:
 #      - broker
 
@@ -32,10 +32,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      kafka-init-topics:
-        condition: service_completed_successfully
-      keycloak-init:
-        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
 
     environment:
       REQUEST_EVENT_BUS_BROKERS: ${REQUEST_EVENT_BUS_BROKERS}
@@ -53,6 +51,8 @@ services:
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_ROLES_TO_PERMIT: ${KEYCLOAK_ROLES_TO_PERMIT}
+      REQUEST_EVENT_BUS_USERNAME: ${REQUEST_EVENT_BUS_WRITER_USERNAME}
+      REQUEST_EVENT_BUS_PASSWORD: ${REQUEST_EVENT_BUS_WRITER_PASSWORD}
 #    networks:
 #      - database
 #      - broker
@@ -160,16 +160,16 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13.3-management
-    hostname: myrabbit
+#    hostname: rabbitmq
     environment:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASS=${RABBITMQ_PASS}
-      - RABBITMQ_CONFIG_FILE=/rabbit-setup/rabbitmq.conf
+      - RABBITMQ_CONFIG_FILE=/rabbit-setup/conf/rabbitmq.conf
     ports:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - ./rabbit-mq/conf:/rabbit-setup
+      - ./rabbit-mq:/rabbit-setup
 
 
 

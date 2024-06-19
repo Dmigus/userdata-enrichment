@@ -5,6 +5,7 @@ go 1.22
 require (
 	github.com/IBM/sarama v1.43.2
 	github.com/gin-gonic/gin v1.10.0
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/samber/lo v1.39.0
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/files v1.0.1

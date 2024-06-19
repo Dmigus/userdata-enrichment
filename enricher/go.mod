@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/IBM/sarama v1.43.2
 	github.com/dnwe/otelsarama v0.0.0-20240308230250-9388d9d40bc0
+	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/viper v1.18.2
 	github.com/vrischmann/envconfig v1.3.0
@@ -13,7 +14,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.7.0
 	google.golang.org/grpc v1.59.0
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
