@@ -11,7 +11,3 @@
 - username: testuser
 - password: userpassword
 
-
-
-TODO:
-- заменить Kafka на RabbitMQ
