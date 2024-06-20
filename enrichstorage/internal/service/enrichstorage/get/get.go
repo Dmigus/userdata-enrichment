@@ -42,13 +42,7 @@ func (g *Getter) GetWithPaging(ctx context.Context, req Request) (Result, error)
 	if err != nil {
 		return Result{}, err
 	}
-	var before *PrevPage
-	var after *NextPage
-	if len(data) == 0 {
-		before, after, err = g.compPagingForEmpty(ctx, req)
-	} else {
-		before, after, err = g.compPagingForExisting(ctx, req, data)
-	}
+	before, after, err := g.compPaging(ctx, req, data)
 	if err != nil {
 		return Result{}, err
 	}
@@ -59,53 +53,48 @@ func (g *Getter) GetWithPaging(ctx context.Context, req Request) (Result, error)
 	}, nil
 }
 
-func (g *Getter) compPagingForEmpty(ctx context.Context, req Request) (before *PrevPage, after *NextPage, err error) {
-	if bef, ok := req.Pagination.Before(); ok {
-		have, err := g.repo.DoesHaveRecordsAfter(ctx, req.Filters, *bef)
-		if err != nil {
-			return nil, nil, err
-		}
-		if have {
-			page := NextPage(*bef)
-			return nil, &page, nil
-		}
-	} else if aft, ok := req.Pagination.After(); ok {
-		have, err := g.repo.DoesHaveRecordsBefore(ctx, req.Filters, *aft)
-		if err != nil {
-			return nil, nil, err
-		}
-		if have {
-			page := PrevPage(*aft)
-			return &page, nil, nil
-		}
+func (g *Getter) compPaging(ctx context.Context, req Request, data []types.EnrichedRecord) (*PrevPage, *NextPage, error) {
+	var leftBorder, rightBorder *types.FIO
+	if len(data) == 0 {
+		leftBorder, _ = req.Pagination.After()
+		rightBorder, _ = req.Pagination.Before()
+	} else {
+		minRecord := slices.MinFunc(data, func(a, b types.EnrichedRecord) int {
+			return g.comparator.Cmp(a.Fio, b.Fio)
+		})
+		leftBorder = &minRecord.Fio
+		maxRecord := slices.MaxFunc(data, func(a, b types.EnrichedRecord) int {
+			return g.comparator.Cmp(a.Fio, b.Fio)
+		})
+		rightBorder = &maxRecord.Fio
 	}
-	return nil, nil, nil
+	return g.compPagingForWindow(ctx, req.Filters, leftBorder, rightBorder)
 }
 
-func (g *Getter) compPagingForExisting(ctx context.Context, req Request, res []types.EnrichedRecord) (before *PrevPage, after *NextPage, err error) {
-	maxRecord := slices.MaxFunc(res, func(a, b types.EnrichedRecord) int {
-		return g.comparator.Cmp(a.Fio, b.Fio)
-	})
-	have, err := g.repo.DoesHaveRecordsAfter(ctx, req.Filters, maxRecord.Fio)
-	if err != nil {
-		return nil, nil, err
+func (g *Getter) compPagingForWindow(ctx context.Context, filters Filters, leftBorder, rightBorder *types.FIO) (*PrevPage, *NextPage, error) {
+	var prev *PrevPage
+	if leftBorder != nil {
+		have, err := g.repo.DoesHaveRecordsBefore(ctx, filters, *leftBorder)
+		if err != nil {
+			return nil, nil, err
+		}
+		if have {
+			page := PrevPage(*leftBorder)
+			prev = &page
+		}
 	}
-	if have {
-		page := NextPage(maxRecord.Fio)
-		after = &page
+	var after *NextPage
+	if rightBorder != nil {
+		have, err := g.repo.DoesHaveRecordsAfter(ctx, filters, *rightBorder)
+		if err != nil {
+			return nil, nil, err
+		}
+		if have {
+			page := NextPage(*rightBorder)
+			after = &page
+		}
 	}
-	minRecord := slices.MinFunc(res, func(a, b types.EnrichedRecord) int {
-		return g.comparator.Cmp(a.Fio, b.Fio)
-	})
-	have, err = g.repo.DoesHaveRecordsBefore(ctx, req.Filters, minRecord.Fio)
-	if err != nil {
-		return nil, nil, err
-	}
-	if have {
-		page := PrevPage(minRecord.Fio)
-		before = &page
-	}
-	return before, after, nil
+	return prev, after, nil
 }
 
 func (g *Getter) IsFIOPresents(ctx context.Context, fio types.FIO) (bool, error) {
