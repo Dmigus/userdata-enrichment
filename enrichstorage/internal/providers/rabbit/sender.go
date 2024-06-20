@@ -5,6 +5,7 @@ import (
 	"enrichstorage/pkg/types"
 	"errors"
 	"fmt"
+
 	lop "github.com/samber/lo/parallel"
 	amqp "github.com/wagslane/go-rabbitmq"
 	"go.uber.org/zap"

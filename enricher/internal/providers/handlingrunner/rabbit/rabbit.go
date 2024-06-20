@@ -5,9 +5,10 @@ import (
 	"enricher/internal/service"
 	"enrichstorage/pkg/types"
 	"fmt"
+	"sync"
+
 	"github.com/wagslane/go-rabbitmq"
 	"go.uber.org/zap"
-	"sync"
 )
 
 type (
@@ -40,8 +41,8 @@ func (r *RabbitRunner) Run(ctx context.Context, handler service.Handler) {
 		closeOnce.Do(cons.Close)
 	}()
 	err = cons.Run(func(d rabbitmq.Delivery) (action rabbitmq.Action) {
-		fio, err := types.FIOfromBytes(d.Body)
-		if err != nil {
+		fio, transformErr := types.FIOfromBytes(d.Body)
+		if transformErr != nil {
 			return rabbitmq.NackDiscard
 		}
 		handler.Handle(ctx, fio)

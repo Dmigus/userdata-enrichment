@@ -84,8 +84,8 @@ func setupRunner(config *Config, logger *zap.Logger) (*rabbit.RabbitRunner, erro
 		config.RequestEventBus.Brokers[0],
 		config.RequestEventBus.Topic,
 		rabbit.RabbitCreds{
-			config.RequestEventBus.Username,
-			config.RequestEventBus.Password,
+			Name:     config.RequestEventBus.Username,
+			Password: config.RequestEventBus.Password,
 		},
 		logger)
 	if err != nil {
