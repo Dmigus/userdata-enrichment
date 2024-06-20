@@ -160,7 +160,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13.3-management
-#    hostname: rabbitmq
     environment:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASS=${RABBITMQ_PASS}

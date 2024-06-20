@@ -5,9 +5,9 @@ import (
 	"enricher/internal/service"
 	"enrichstorage/pkg/types"
 	"fmt"
-	advancedErrs "github.com/pkg/errors"
-	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/wagslane/go-rabbitmq"
 	"go.uber.org/zap"
+	"sync"
 )
 
 type (
@@ -28,44 +28,47 @@ func NewRabbitRunner(addr string, queue string, creds RabbitCreds, logger *zap.L
 }
 
 func (r *RabbitRunner) Run(ctx context.Context, handler service.Handler) {
-	msgs, closeFunc, err := r.getMessagesChan(ctx)
+	cons, err := newRabbitConsumer(r.addr, r.queue, r.creds, r.logger)
 	if err != nil {
-		r.logger.Error("error initializing consuming", zap.Error(err))
+		r.logger.Error("error creating consumer client", zap.Error(err))
 		return
 	}
-	defer closeFunc()
-	for msg := range msgs {
-		fio, err := types.FIOfromBytes(msg.Body)
+	closeOnce := sync.Once{}
+	defer closeOnce.Do(cons.Close)
+	go func() {
+		<-ctx.Done()
+		closeOnce.Do(cons.Close)
+	}()
+	err = cons.Run(func(d rabbitmq.Delivery) (action rabbitmq.Action) {
+		fio, err := types.FIOfromBytes(d.Body)
 		if err != nil {
-			_ = msg.Nack(false, false)
-		} else {
-			handler.Handle(ctx, fio)
-			_ = msg.Ack(false)
+			return rabbitmq.NackDiscard
 		}
+		handler.Handle(ctx, fio)
+		return rabbitmq.Ack
+	})
+	if err != nil {
+		r.logger.Error("error during consuming", zap.Error(err))
 	}
 }
 
-func (r *RabbitRunner) getMessagesChan(ctx context.Context) (<-chan amqp.Delivery, func() error, error) {
-	url := fmt.Sprintf("amqp://%s:%s@%s", r.creds.Name, r.creds.Password, r.addr)
-	conn, err := amqp.Dial(url)
+func newRabbitConsumer(addr string, queue string, creds RabbitCreds, logger *zap.Logger) (*rabbitmq.Consumer, error) {
+	url := fmt.Sprintf("amqp://%s:%s@%s", creds.Name, creds.Password, addr)
+	conn, err := rabbitmq.NewConn(
+		url,
+	)
 	if err != nil {
-		return nil, nil, advancedErrs.Wrap(err, "error connecting to rabbit")
+		return nil, err
 	}
-	ch, err := conn.Channel()
-	if err != nil {
-		_ = conn.Close()
-		return nil, nil, advancedErrs.Wrap(err, "error getting channel to rabbit")
-	}
-	msgs, err := ch.ConsumeWithContext(ctx, r.queue, "",
-		false,
-		false, // exclusive
-		false, // no-local
-		false, // no-wait
-		nil,   // args
+	consumer, err := rabbitmq.NewConsumer(
+		conn,
+		queue,
+		rabbitmq.WithConsumerOptionsQueueNoDeclare,
+		rabbitmq.WithConsumerOptionsLogger(logger.Sugar()),
 	)
 	if err != nil {
 		_ = conn.Close()
-		return nil, nil, advancedErrs.Wrap(err, "error getting messages channel")
+		return nil, err
 	}
-	return msgs, conn.Close, err
+	return consumer, nil
 }

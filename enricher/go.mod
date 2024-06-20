@@ -5,10 +5,9 @@ go 1.22.0
 require (
 	github.com/IBM/sarama v1.43.2
 	github.com/dnwe/otelsarama v0.0.0-20240308230250-9388d9d40bc0
-	github.com/pkg/errors v0.9.1
-	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/viper v1.18.2
 	github.com/vrischmann/envconfig v1.3.0
+	github.com/wagslane/go-rabbitmq v0.13.0
 	go.opentelemetry.io/otel v1.27.0
 	go.uber.org/fx v1.21.1
 	go.uber.org/zap v1.27.0
@@ -41,6 +40,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
